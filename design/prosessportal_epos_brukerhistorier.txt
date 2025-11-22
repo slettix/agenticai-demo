@@ -1,0 +1,41 @@
+Prosessportal – Epos og Brukerhistorier
+Epos 1: Grunnleggende prosessportal & navigasjon
+- Som vanlig bruker vil jeg se en liste over alle tilgjengelige prosesser slik at jeg enkelt kan finne riktig prosess.
+- Som vanlig bruker vil jeg kunne klikke meg inn på en prosess og se både overordnet flyt og detaljerte delsteg.
+- Som vanlig bruker vil jeg kunne se tidligere versjoner av prosessen og endringslogg.
+- Som bruker vil jeg at portalen skal fungere både på desktop og mobil.
+Epos 2: Autentisering & tilgangsstyring (RBAC)
+- Som bruker vil jeg logge inn via virksomhetens SSO slik at jeg slipper egne brukernavn/passord.
+- Som systemadmin vil jeg kunne konfigurere hvilke AD-grupper som gir roller i systemet.
+- Som prosesseier/QA vil jeg se ekstra funksjoner i UI basert på min rolle.
+Epos 3: QA- og godkjenningsflyt
+- Som prosesseier/QA vil jeg se en liste over prosessforslag som venter på min vurdering.
+- Som prosesseier/QA vil jeg se en AI-generert oppsummering av forslag.
+- Som prosesseier/QA vil jeg se diff på prosessnivå (tekst og diagram).
+- Som prosesseier/QA vil jeg kunne kommentere på forslag.
+- Som prosesseier/QA vil jeg kunne godkjenne forslag.
+- Som prosesseier/QA vil jeg kunne avvise forslag eller be om ny revisjon.
+Epos 4: SME-tilbakemeldinger og forslagsflyt
+- Som SME vil jeg kunne foreslå endringer på delsteg uten å jobbe i Git.
+- Som prosesseier vil jeg se alle SME-forslag relatert til en prosess.
+- Som prosesseier vil jeg kunne sende SME-forslag til agentene for ny revisjon.
+Epos 5: Git-integrasjon (docs-as-code)
+- Som backend-tjeneste vil jeg hente publiserte prosessdokumenter fra Git.
+- Som system vil jeg opprette PR når nye forslag genereres.
+- Som backend vil jeg hente diffs mellom PR og main.
+- Som system vil jeg kunne merge automatisk når QA godkjenner.
+Epos 6: Agent-integrasjon (Python Agentic AI)
+- Som prosesseier vil jeg kunne generere et første utkast til ny prosess med AI.
+- Som prosesseier vil jeg trigge datadrevet revisjon.
+- Som prosesseier vil jeg se status på genereringsjobber.
+Epos 7: Metadata, versjonering & audit-logg (SQL)
+- Som system vil jeg vedlikeholde en tabell over alle prosesser med metadata.
+- Som system vil jeg lagre metadata per versjon.
+- Som revisjon vil jeg kunne se audit-logg for QA-vedtak.
+Epos 8: Observability & rapporter
+- Som QA-leder vil jeg se hvor mange forslag som venter og hvor lenge.
+- Som prosesseier vil jeg se hvor ofte prosessen endres og hvorfor.
+Epos 9: Ikke-funksjonelle krav (sikkerhet, ytelse, drift)
+- Som driftsansvarlig vil jeg ha strukturert logging og feilhåndtering.
+- Som sikkerhetsansvarlig vil jeg ha rollebasert tilgang til API.
+- Som bruker vil jeg at portalen skal laste raskt.
