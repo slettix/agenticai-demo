@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "GJ3KbUrzVekc1qakXxqJaL4uc3N5xufZSvjmjgZEATw=",
+  "Source": "ProsessPortal.API",
+  "BasePath": "_content/ProsessPortal.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

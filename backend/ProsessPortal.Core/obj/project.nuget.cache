@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "pRcPKC7kyXg=",
+  "success": true,
+  "projectFilePath": "/Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.Core/ProsessPortal.Core.csproj",
+  "expectedPackageFiles": [
+    "/Users/e.sletteng-fagerli/.nuget/packages/fluentvalidation/11.8.0/fluentvalidation.11.8.0.nupkg.sha512",
+    "/Users/e.sletteng-fagerli/.nuget/packages/microsoft.netcore.app.ref/8.0.16/microsoft.netcore.app.ref.8.0.16.nupkg.sha512",
+    "/Users/e.sletteng-fagerli/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.16/microsoft.aspnetcore.app.ref.8.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

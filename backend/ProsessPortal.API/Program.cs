@@ -85,7 +85,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireCreateProsess", policy => 
+        policy.RequireClaim("permission", "create_prosess"));
+    options.AddPolicy("RequireEditProsess", policy => 
+        policy.RequireClaim("permission", "edit_prosess"));
+    options.AddPolicy("RequireDeleteProsess", policy => 
+        policy.RequireClaim("permission", "delete_prosess"));
+    options.AddPolicy("RequireApproveProsess", policy => 
+        policy.RequireClaim("permission", "approve_prosess"));
+    options.AddPolicy("RequireViewQA", policy => 
+        policy.RequireClaim("permission", "view_qa_queue"));
+});
 
 // CORS
 builder.Services.AddCors(options =>
@@ -103,6 +115,7 @@ builder.Services.AddCors(options =>
 // Application services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IProsessService, ProsessService>();
 
 var app = builder.Build();
 

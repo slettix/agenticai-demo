@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.Core/ProsessPortal.Core.csproj": {}
+  },
+  "projects": {
+    "/Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.Core/ProsessPortal.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.Core/ProsessPortal.Core.csproj",
+        "projectName": "ProsessPortal.Core",
+        "projectPath": "/Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.Core/ProsessPortal.Core.csproj",
+        "packagesPath": "/Users/e.sletteng-fagerli/.nuget/packages/",
+        "outputPath": "/Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/e.sletteng-fagerli/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/opt/homebrew/Cellar/dotnet/9.0.5/libexec/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[11.8.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.5/libexec/sdk/9.0.106/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
