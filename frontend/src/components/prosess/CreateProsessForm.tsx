@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { prosessService } from '../../services/prosessService';
 import { ProcessStepBuilder, ProcessStep } from './ProcessStepBuilder';
+import { AIProcessSuggestions } from './AIProcessSuggestions';
 import './CreateProsessForm.css';
 
 interface CreateProsessFormProps {
@@ -46,6 +47,8 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
   
   const [processSteps, setProcessSteps] = useState<ProcessStep[]>([]);
   const [stepBuilderMode, setStepBuilderMode] = useState<'manual' | 'ai' | 'template'>('manual');
+  const [showAISuggestions, setShowAISuggestions] = useState(false);
+  const [generatingAISteps, setGeneratingAISteps] = useState(false);
   
   const [categories, setCategories] = useState<ProsessCategories | null>(null);
   const [templates, setTemplates] = useState<ITILTemplate[]>([]);
@@ -150,6 +153,39 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
 
   const hasUnsavedChanges = () => {
     return formData.title || formData.description || formData.category || formData.itilArea || formData.tags || processSteps.length > 0;
+  };
+
+  const handleApplyAISuggestion = (suggestion: any) => {
+    if (suggestion.type === 'step' && suggestion.suggestedStep) {
+      // Add the suggested step to the current process steps
+      setProcessSteps(prevSteps => [...prevSteps, suggestion.suggestedStep]);
+      setStepBuilderMode('manual'); // Switch to manual mode to show the added step
+    } else if (suggestion.type === 'improvement') {
+      // Handle improvement suggestions (could show a modal or apply changes)
+      alert(`Forbedring anvendt: ${suggestion.title}\n\n${suggestion.description}`);
+    } else if (suggestion.type === 'template') {
+      // Switch to template mode if a template is suggested
+      setStepBuilderMode('template');
+    }
+  };
+
+  const handleGenerateAISteps = async () => {
+    setGeneratingAISteps(true);
+    setStepBuilderMode('ai');
+    
+    try {
+      // Simulate AI generation process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // In a real implementation, this would call the backend to generate steps
+      // For now, we'll just show the AI mode
+      alert('AI-generering av prosesstrinn vil bli implementert i backend-integrasjonen.');
+      
+    } catch (error) {
+      setError('Kunne ikke generere AI-trinn. Prøv igjen senere.');
+    } finally {
+      setGeneratingAISteps(false);
+    }
   };
 
   if (!categories) {
@@ -389,6 +425,32 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
               </div>
               <p><small>💡 Disse trinnene vil bli brukt som utgangspunkt når prosessen opprettes.</small></p>
             </div>
+          )}
+        </div>
+
+        {/* AI Process Suggestions */}
+        <div className="form-section">
+          <div className="ai-suggestions-toggle">
+            <button
+              type="button"
+              className={`toggle-btn ${showAISuggestions ? 'active' : ''}`}
+              onClick={() => setShowAISuggestions(!showAISuggestions)}
+            >
+              {showAISuggestions ? '🔽' : '▶️'} 🤖 AI-drevne prosessforslag {showAISuggestions ? '(skjul)' : '(vis)'}
+            </button>
+          </div>
+          
+          {showAISuggestions && (
+            <AIProcessSuggestions
+              processTitle={formData.title}
+              processDescription={formData.description}
+              category={formData.category}
+              itilArea={formData.itilArea}
+              currentSteps={processSteps}
+              onApplySuggestion={handleApplyAISuggestion}
+              onGenerateSteps={handleGenerateAISteps}
+              isLoading={isLoading || generatingAISteps}
+            />
           )}
         </div>
 
