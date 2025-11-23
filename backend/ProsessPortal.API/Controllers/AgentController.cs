@@ -159,7 +159,12 @@ public class AgentController : ControllerBase
     {
         try
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "unknown";
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            
             _logger.LogInformation("User {UserId} creating process from generation job {JobId}", userId, jobId);
 
             // Get the generation result
@@ -178,7 +183,7 @@ public class AgentController : ControllerBase
             );
 
             // Create the process
-            var createdProcess = await _prosessService.CreateProsessAsync(createRequest, userId);
+            var createdProcess = await _prosessService.CreateProsessAsync(createRequest, userId.Value);
 
             // TODO: Create steps from generationResult.Steps
             // This would require extending the ProsessService to handle step creation
@@ -199,7 +204,12 @@ public class AgentController : ControllerBase
     {
         try
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "unknown";
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            
             _logger.LogInformation("User {UserId} applying revision from job {JobId}", userId, jobId);
 
             // Get the revision result
@@ -223,7 +233,7 @@ public class AgentController : ControllerBase
                 Category: currentProcess.Category
             );
 
-            var updatedProcess = await _prosessService.UpdateProsessAsync(revisionResult.ProcessId, updateRequest, userId);
+            var updatedProcess = await _prosessService.UpdateProsessAsync(revisionResult.ProcessId, updateRequest, userId.Value);
 
             // TODO: Update steps from revisionResult.UpdatedSteps
             // This would require extending the ProsessService to handle step updates
@@ -236,5 +246,15 @@ public class AgentController : ControllerBase
             _logger.LogError(ex, "Failed to apply revision from job {JobId}", jobId);
             return StatusCode(500, new { Error = "Failed to apply revision", Details = ex.Message });
         }
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return userId;
+        }
+        return null;
     }
 }
