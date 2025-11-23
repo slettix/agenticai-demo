@@ -12,9 +12,11 @@ class ProcessGeneratorAgent:
     """AI Agent that generates new business processes based on requirements"""
     
     def __init__(self):
-        self.client = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY")
-        )
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY environment variable must be set")
+        
+        self.client = AsyncOpenAI(api_key=api_key)
         self.model = os.getenv("OPENAI_MODEL", "gpt-4")
         
     async def generate_process(self, request_data: Dict[str, Any], progress_callback: Callable[[int, str], None]) -> Dict[str, Any]:
