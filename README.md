@@ -37,6 +37,18 @@ npm start
 
 Frontend vil være tilgjengelig på: `http://localhost:3000`
 
+### AI Agents (Python)
+
+**Forutsetninger:** OpenAI API key i environment variabel `OPENAI_API_KEY`
+
+```bash
+cd agents
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8001
+```
+
+AI Agents vil være tilgjengelig på: `http://localhost:8001`
+
 ### Standard bruker
 
 - **Brukernavn:** admin
@@ -63,6 +75,16 @@ Frontend vil være tilgjengelig på: `http://localhost:3000`
 - [x] Responsiv design for mobile og desktop
 - [x] Rollebasert UI-tilpasning
 - [x] 4 demo-prosesser med realistic data
+
+### Epic 6: Agent-integrasjon (Python Agentic AI) ✅
+
+- [x] AI-prosessgenerering med OpenAI GPT-4
+- [x] Datadrevet prosessrevisjon og optimalisering
+- [x] Jobb-status tracking med real-time updates
+- [x] Python FastAPI microservices
+- [x] .NET 9 backend integrasjon
+- [x] React frontend for AI-operasjoner
+- [x] Robust feilhåndtering og retry-mekanismer
 
 #### Roller og tillatelser:
 
@@ -124,20 +146,20 @@ npm test
 
 ## 🎯 Neste steg
 
-### Epic 1: Grunnleggende prosessportal & navigasjon
-- [ ] Prosessoversikt med søk/filter
-- [ ] Prosessdetaljer med visuell flyt
-- [ ] Versjonering og historie
-
-### Epic 6: Agent-integrasjon (Python Agentic AI)
-- [ ] AI-prosessgenerering
-- [ ] Datadrevet revisjon
-- [ ] Jobb-status tracking
-
 ### Epic 3: QA- og godkjenningsflyt
 - [ ] QA-kø og dashboard
 - [ ] AI-oppsummeringer av endringer
 - [ ] Automatisk merge workflow
+
+### Epic 4: Git-integrasjon
+- [ ] Prosessdokument lagring i Git
+- [ ] Versjonskontroll og branching
+- [ ] Automatiske commits ved endringer
+
+### Epic 5: Metrics og rapporter
+- [ ] Prosess-performance tracking
+- [ ] Brukerstatistikk og dashboards
+- [ ] Automatiske rapporter
 
 ## 🔧 Konfigurasjon
 
