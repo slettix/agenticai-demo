@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { prosessService } from '../../services/prosessService';
 import { ProcessStepBuilder, ProcessStep } from './ProcessStepBuilder';
 import { AIProcessSuggestions } from './AIProcessSuggestions';
+import { ProcessTemplateManager } from './ProcessTemplateManager';
 import './CreateProsessForm.css';
 
 interface CreateProsessFormProps {
@@ -49,6 +50,8 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
   const [stepBuilderMode, setStepBuilderMode] = useState<'manual' | 'ai' | 'template'>('manual');
   const [showAISuggestions, setShowAISuggestions] = useState(false);
   const [generatingAISteps, setGeneratingAISteps] = useState(false);
+  const [showTemplateManager, setShowTemplateManager] = useState(false);
+  const [selectedProcessTemplate, setSelectedProcessTemplate] = useState<any>(null);
   
   const [categories, setCategories] = useState<ProsessCategories | null>(null);
   const [templates, setTemplates] = useState<ITILTemplate[]>([]);
@@ -186,6 +189,39 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
     } finally {
       setGeneratingAISteps(false);
     }
+  };
+
+  const handleTemplateSelect = (template: any) => {
+    setSelectedProcessTemplate(template);
+    
+    // Auto-fill form data from template
+    setFormData(prev => ({
+      ...prev,
+      title: template.name,
+      description: template.description,
+      category: template.category,
+      itilArea: template.itilArea
+    }));
+    
+    // Load template steps
+    setProcessSteps(template.defaultSteps);
+    setStepBuilderMode('template');
+    
+    // Close template manager
+    setShowTemplateManager(false);
+    
+    alert(`Mal "${template.name}" er valgt og lastet inn i skjemaet.`);
+  };
+
+  const handleValidateCompliance = (process: any) => {
+    // Mock compliance validation
+    return {
+      score: 85,
+      status: 'partial' as const,
+      passedChecks: [],
+      failedChecks: [],
+      recommendations: ['Legg til ekstra godkjenningstrinn', 'Inkluder GDPR-sjekk']
+    };
   };
 
   if (!categories) {
@@ -453,6 +489,71 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
             />
           )}
         </div>
+
+        {/* Process Template Manager */}
+        <div className="form-section">
+          <div className="template-manager-toggle">
+            <button
+              type="button"
+              className={`toggle-btn ${showTemplateManager ? 'active' : ''}`}
+              onClick={() => setShowTemplateManager(!showTemplateManager)}
+            >
+              {showTemplateManager ? '🔽' : '▶️'} 📋 Prosessmaler og ITIL-samsvar {showTemplateManager ? '(skjul)' : '(vis)'}
+            </button>
+          </div>
+          
+          {showTemplateManager && (
+            <ProcessTemplateManager
+              itilArea={formData.itilArea}
+              category={formData.category}
+              onTemplateSelect={handleTemplateSelect}
+              onValidateCompliance={handleValidateCompliance}
+              selectedTemplate={selectedProcessTemplate}
+            />
+          )}
+        </div>
+
+        {/* Selected Template Info */}
+        {selectedProcessTemplate && (
+          <div className="form-section">
+            <div className="selected-template-info">
+              <h3>📋 Valgt prosessmal</h3>
+              <div className="template-summary">
+                <h4>{selectedProcessTemplate.name}</h4>
+                <p>{selectedProcessTemplate.description}</p>
+                <div className="template-details">
+                  <span>🎯 ITIL: {selectedProcessTemplate.itilArea}</span>
+                  <span>📊 {selectedProcessTemplate.defaultSteps.length} trinn</span>
+                  <span>⏱️ {selectedProcessTemplate.estimatedDuration} min</span>
+                  <span>🏆 {selectedProcessTemplate.maturityLevel}</span>
+                </div>
+                <div className="template-actions">
+                  <button
+                    type="button"
+                    className="remove-template-btn"
+                    onClick={() => {
+                      setSelectedProcessTemplate(null);
+                      setProcessSteps([]);
+                      setStepBuilderMode('manual');
+                    }}
+                  >
+                    🗑️ Fjern mal
+                  </button>
+                  <button
+                    type="button"
+                    className="validate-compliance-btn"
+                    onClick={() => {
+                      const result = handleValidateCompliance(selectedProcessTemplate);
+                      alert(`Samsvarsscore: ${result.score}%\nStatus: ${result.status}`);
+                    }}
+                  >
+                    ✅ Sjekk samsvar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Error handling */}
         {error && (

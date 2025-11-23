@@ -211,6 +211,87 @@
   color: #007bff;
 }
 
+/* Template Manager Integration */
+.template-manager-toggle {
+  margin-bottom: 1rem;
+}
+
+/* Selected Template Info */
+.selected-template-info {
+  padding: 1.5rem;
+  background: #fff3e0;
+  border: 1px solid #ffcc80;
+  border-radius: 6px;
+}
+
+.selected-template-info h3 {
+  margin: 0 0 1rem 0;
+  color: #e65100;
+}
+
+.template-summary h4 {
+  margin: 0 0 0.5rem 0;
+  color: #e65100;
+}
+
+.template-summary p {
+  margin: 0 0 1rem 0;
+  color: #5d4037;
+  line-height: 1.4;
+}
+
+.template-details {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.template-details span {
+  background: white;
+  color: #5d4037;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #ffcc80;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.template-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.remove-template-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.remove-template-btn:hover {
+  background: #c82333;
+}
+
+.validate-compliance-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.validate-compliance-btn:hover {
+  background: #218838;
+}
+
 .form-section {
   border: 1px solid #e9ecef;
   border-radius: 6px;
