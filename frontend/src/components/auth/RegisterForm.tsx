@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { RegisterRequest } from '../../types/auth';
+import { useAuth } from '../../contexts/AuthContext.tsx';
+import { RegisterRequest } from '../../types/auth.ts';
 
 interface RegisterFormProps {
   onRegisterSuccess?: () => void;

@@ -117,6 +117,15 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IProsessService, ProsessService>();
 
+// HTTP client for agent service
+builder.Services.AddHttpClient<IAgentService, AgentService>(client =>
+{
+    var agentServiceUrl = builder.Configuration["AgentService:BaseUrl"] ?? "http://localhost:8001";
+    client.BaseAddress = new Uri(agentServiceUrl);
+    client.Timeout = TimeSpan.FromMinutes(5); // Allow long-running AI operations
+});
+builder.Services.AddScoped<IAgentService, AgentService>();
+
 var app = builder.Build();
 
 // Seed database

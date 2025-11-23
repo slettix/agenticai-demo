@@ -5,7 +5,7 @@ En intelligent prosesshåndteringsportal som kombinerer React frontend, .NET bac
 ## 🏗️ Arkitektur
 
 - **Frontend:** React 18 + TypeScript
-- **Backend:** .NET 8 + Entity Framework Core
+- **Backend:** .NET 9 + Entity Framework Core
 - **AI Agents:** Python + FastAPI + LangChain
 - **Database:** SQL Server / In-Memory (for utvikling)
 
@@ -13,7 +13,7 @@ En intelligent prosesshåndteringsportal som kombinerer React frontend, .NET bac
 
 ### Forutsetninger
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Node.js 18+](https://nodejs.org/)
 - [Python 3.9+](https://python.org/) (for AI-agenter)
 
@@ -53,6 +53,16 @@ Frontend vil være tilgjengelig på: `http://localhost:3000`
 - [x] Responsiv login/register UI
 - [x] Beskyttede ruter basert på roller/tillatelser
 - [x] 5 standard roller: Admin, ProsessEier, QA, SME, Bruker
+
+### Epic 1: Grunnleggende prosessportal & navigasjon ✅
+
+- [x] Prosessoversikt med søk, filter og sortering
+- [x] Detaljert prosessvisning med tabbed interface
+- [x] Visual prosessflyt med hierarkiske steg
+- [x] Versjonering og endringslogg
+- [x] Responsiv design for mobile og desktop
+- [x] Rollebasert UI-tilpasning
+- [x] 4 demo-prosesser med realistic data
 
 #### Roller og tillatelser:
 

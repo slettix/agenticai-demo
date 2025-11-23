@@ -16,7 +16,7 @@ Prosessportal - En intelligent prosesshåndteringsportal som kombinerer React fr
 
 ### Backend (.NET)
 - **Location**: `backend/`
-- **Framework**: .NET Core/ASP.NET Core
+- **Framework**: .NET 9/ASP.NET Core
 - **Architecture**: Clean Architecture (API, Core, Infrastructure)
 - **Database**: Entity Framework Core
 

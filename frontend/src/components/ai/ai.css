@@ -1,0 +1,558 @@
+/* AI Components Styling */
+
+.ai-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.ai-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ai-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5em;
+}
+
+.ai-header p {
+  margin: 0;
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+/* Health Status */
+.health-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.health-status.healthy {
+  background: rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+}
+
+.health-status.degraded {
+  background: rgba(255, 193, 7, 0.2);
+  color: #f57c00;
+}
+
+.health-status.unhealthy,
+.health-status.unknown {
+  background: rgba(244, 67, 54, 0.2);
+  color: #d32f2f;
+}
+
+/* Navigation */
+.ai-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ai-nav button {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  background: #f5f5f5;
+  color: #666;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ai-nav button:hover:not(:disabled) {
+  background: #e0e0e0;
+  transform: translateY(-1px);
+}
+
+.ai-nav button.active {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.ai-nav button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.job-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+/* Form Containers */
+.ai-form-container {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.ai-form-container h2 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 1.8em;
+}
+
+.ai-form-container > p {
+  color: #666;
+  margin: 0 0 25px 0;
+  line-height: 1.6;
+}
+
+.ai-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Requirements/Feedback/Goals Input */
+.requirements-input,
+.feedback-input,
+.goals-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.requirements-input input,
+.feedback-input input,
+.goals-input input {
+  flex: 1;
+}
+
+.add-button {
+  padding: 12px 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-button:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+}
+
+.requirements-list,
+.feedback-list,
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.requirement-item,
+.feedback-item,
+.goal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.remove-button {
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.remove-button:hover {
+  background: #d32f2f;
+}
+
+/* Submit Button */
+.ai-submit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ai-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.ai-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Messages */
+.message-container {
+  margin-bottom: 20px;
+}
+
+.message {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.success-message {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.close-button:hover {
+  opacity: 1;
+}
+
+/* Job Status Tracker */
+.job-tracker {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.job-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.job-id {
+  font-family: monospace;
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.status-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px;
+  margin: 10px 0;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.status-icon {
+  font-size: 1.5em;
+  min-width: 30px;
+  text-align: center;
+}
+
+.status-content {
+  flex: 1;
+}
+
+.status-text {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.status-message {
+  color: #666;
+  font-style: italic;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #333;
+}
+
+.timing-info {
+  margin: 15px 0;
+  padding: 15px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.timing-info div {
+  margin-bottom: 5px;
+}
+
+.result-preview {
+  margin-top: 20px;
+  padding: 20px;
+  background: #e8f5e8;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.result-preview h4 {
+  margin: 0 0 15px 0;
+  color: #2e7d32;
+}
+
+.generation-result,
+.revision-result {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.generation-result div,
+.revision-result div {
+  color: #333;
+}
+
+.revision-result ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.action-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-button {
+  background: #4caf50;
+  color: white;
+}
+
+.create-button:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.apply-button {
+  background: #2196f3;
+  color: white;
+}
+
+.apply-button:hover:not(:disabled) {
+  background: #1976d2;
+}
+
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Service Unavailable */
+.service-unavailable {
+  text-align: center;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.service-unavailable h3 {
+  color: #f57c00;
+  margin-bottom: 15px;
+}
+
+.service-unavailable ul {
+  text-align: left;
+  max-width: 300px;
+  margin: 20px auto;
+}
+
+.retry-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  background: #5a67d8;
+  transform: translateY(-1px);
+}
+
+/* Access Denied */
+.access-denied {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.access-denied h2 {
+  color: #d32f2f;
+  margin-bottom: 15px;
+}
+
+/* No Jobs */
+.no-jobs {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ai-page {
+    padding: 10px;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .ai-nav {
+    flex-direction: column;
+  }
+  
+  .job-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .requirements-input,
+  .feedback-input,
+  .goals-input {
+    flex-direction: column;
+  }
+}

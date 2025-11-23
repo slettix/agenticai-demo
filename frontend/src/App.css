@@ -104,7 +104,8 @@ body {
   gap: 2rem;
 }
 
-.app-nav li a {
+.app-nav li a,
+.app-nav li button {
   display: block;
   padding: 1rem 0;
   text-decoration: none;
@@ -112,9 +113,23 @@ body {
   font-weight: 500;
   border-bottom: 3px solid transparent;
   transition: all 0.2s;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
 }
 
-.app-nav li a:hover {
+.app-nav li a:hover,
+.app-nav li button:hover {
+  color: #007bff;
+  border-bottom-color: #007bff;
+}
+
+.app-nav li button.active {
   color: #007bff;
   border-bottom-color: #007bff;
 }

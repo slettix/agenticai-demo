@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LoginForm } from './components/auth/LoginForm';
-import { RegisterForm } from './components/auth/RegisterForm';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AuthProvider, useAuth } from './contexts/AuthContext.tsx';
+import { LoginForm } from './components/auth/LoginForm.tsx';
+import { RegisterForm } from './components/auth/RegisterForm.tsx';
+import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
+import { ProsessListe } from './components/prosess/ProsessListe.tsx';
+import { ProsessDetaljer } from './components/prosess/ProsessDetaljer.tsx';
 import './components/auth/auth.css';
+import './components/prosess/prosess.css';
 import './App.css';
 
 // Main App Content Component
 const AppContent: React.FC = () => {
   const { user, logout, hasRole } = useAuth();
   const [showRegister, setShowRegister] = useState(false);
+  const [currentView, setCurrentView] = useState<'prosesser' | 'prosess-detail'>('prosesser');
+  const [selectedProsessId, setSelectedProsessId] = useState<number | null>(null);
 
   if (!user) {
     return (
@@ -55,7 +60,14 @@ const AppContent: React.FC = () => {
 
       <nav className="app-nav">
         <ul>
-          <li><a href="#prosesser">📋 Prosesser</a></li>
+          <li>
+            <button 
+              onClick={() => setCurrentView('prosesser')}
+              className={currentView === 'prosesser' ? 'active' : ''}
+            >
+              📋 Prosesser
+            </button>
+          </li>
           
           <ProtectedRoute requiredRole="QA">
             <li><a href="#qa-ko">✅ QA-kø</a></li>
@@ -72,46 +84,21 @@ const AppContent: React.FC = () => {
       </nav>
 
       <main className="app-main">
-        <div className="welcome-content">
-          <h2>Velkommen til Prosessportalen</h2>
-          <p>Din personlige dashboard for prosesshåndtering.</p>
-          
-          <div className="features-grid">
-            <div className="feature-card">
-              <h3>📋 Prosessoversikt</h3>
-              <p>Se og søk i alle tilgjengelige prosesser</p>
-            </div>
-            
-            {hasRole('QA') && (
-              <div className="feature-card">
-                <h3>✅ QA & Godkjenning</h3>
-                <p>Håndter godkjenninger med AI-støtte</p>
-              </div>
-            )}
-            
-            {hasRole('ProsessEier') && (
-              <div className="feature-card">
-                <h3>🤖 AI-generering</h3>
-                <p>Generer nye prosesser med kunstig intelligens</p>
-              </div>
-            )}
-            
-            {hasRole('Admin') && (
-              <div className="feature-card">
-                <h3>⚙️ Administrasjon</h3>
-                <p>Administrer brukere og systemkonfigurasjon</p>
-              </div>
-            )}
-          </div>
-
-          <div className="status-info">
-            <h3>Status</h3>
-            <p>✅ Backend API: Tilkoblet</p>
-            <p>✅ Autentisering: Aktiv</p>
-            <p>🔧 AI-agenter: Under utvikling</p>
-            <p>🔧 Git-integrasjon: Under utvikling</p>
-          </div>
-        </div>
+        {currentView === 'prosesser' && (
+          <ProsessListe 
+            onProsessClick={(prosessId) => {
+              setSelectedProsessId(prosessId);
+              setCurrentView('prosess-detail');
+            }}
+          />
+        )}
+        
+        {currentView === 'prosess-detail' && selectedProsessId && (
+          <ProsessDetaljer 
+            prosessId={selectedProsessId}
+            onBack={() => setCurrentView('prosesser')}
+          />
+        )}
       </main>
     </div>
   );
