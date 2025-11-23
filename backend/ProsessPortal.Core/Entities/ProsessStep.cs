@@ -9,7 +9,7 @@ public class ProsessStep
     public string Description { get; set; } = string.Empty;
     public string? DetailedInstructions { get; set; }
     public int OrderIndex { get; set; } // For ordering steps
-    public StepType Type { get; set; } = StepType.Action;
+    public StepType Type { get; set; } = StepType.Task;
     public string? ResponsibleRole { get; set; }
     public int? EstimatedDurationMinutes { get; set; }
     public bool IsOptional { get; set; } = false;
@@ -40,13 +40,15 @@ public class StepConnection
 public enum StepType
 {
     Start = 0,
-    Action = 1,
+    Task = 1,           // Renamed from Action to match frontend
     Decision = 2,
-    Approval = 3,
-    Review = 4,
-    Wait = 5,
-    End = 6,
-    Subprocess = 7
+    Document = 3,       // New type for documentation steps
+    Approval = 4,       // Changed from 3 to 4
+    Gateway = 5,        // New type for gateways/checkpoints
+    Review = 6,         // Changed from 4 to 6
+    Wait = 7,           // Changed from 5 to 7
+    End = 8,            // Changed from 6 to 8
+    Subprocess = 9      // Changed from 7 to 9
 }
 
 public enum ConnectionType
