@@ -1,6 +1,6 @@
 /* CreateProsessForm.css */
 .create-prosess-form {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
   background: white;
@@ -27,6 +27,158 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+}
+
+/* Process Step Builder Integration */
+.step-builder-options {
+  margin-bottom: 1rem;
+}
+
+.builder-mode-selector label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mode-btn {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e9ecef;
+  background: white;
+  color: #495057;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.mode-btn:hover {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.mode-btn.active {
+  border-color: #007bff;
+  background: #007bff;
+  color: white;
+}
+
+/* AI Generation Info */
+.ai-generation-info {
+  padding: 1.5rem;
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.ai-generation-info p {
+  margin-bottom: 1rem;
+  color: #1565c0;
+}
+
+.ai-preview {
+  background: white;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #cce7ff;
+}
+
+.ai-preview h4 {
+  margin: 0 0 0.75rem 0;
+  color: #1565c0;
+  font-size: 0.95rem;
+}
+
+.ai-preview ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.ai-preview li {
+  margin-bottom: 0.25rem;
+  color: #1976d2;
+}
+
+/* Template Steps Preview */
+.template-steps-preview {
+  padding: 1.5rem;
+  background: #fff3e0;
+  border: 1px solid #ffcc80;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.template-steps-preview h4 {
+  margin: 0 0 1rem 0;
+  color: #e65100;
+}
+
+.template-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.template-step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #ffcc80;
+  border-radius: 4px;
+}
+
+.template-step .step-number {
+  background: #ff9800;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.template-step .step-content {
+  flex: 1;
+}
+
+.template-step h5 {
+  margin: 0 0 0.5rem 0;
+  color: #e65100;
+  font-size: 0.9rem;
+}
+
+.template-step p {
+  margin: 0 0 0.5rem 0;
+  color: #5d4037;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.template-step .step-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #8d6e63;
+}
+
+.template-steps-preview p small {
+  color: #bf360c;
+  font-style: italic;
 }
 
 .form-section {

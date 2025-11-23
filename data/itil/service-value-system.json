@@ -1,0 +1,133 @@
+{
+  "name": "ITIL 4 Service Value System (SVS)",
+  "description": "The ITIL service value system describes how all the components and activities of an organization work together to facilitate value creation.",
+  "components": {
+    "guiding_principles": [
+      {
+        "name": "Focus on value",
+        "description": "Everything the organization does should link back, directly or indirectly, to value for stakeholders."
+      },
+      {
+        "name": "Start where you are",
+        "description": "Do not start over without first observing the current state and deciding what can be preserved."
+      },
+      {
+        "name": "Progress iteratively with feedback", 
+        "description": "Resist the temptation to do everything at once. Organize work into smaller, manageable sections."
+      },
+      {
+        "name": "Collaborate and promote visibility",
+        "description": "Working together across boundaries produces results that have greater buy-in, more relevance, and increased likelihood of long-term success."
+      },
+      {
+        "name": "Think and work holistically",
+        "description": "The service management system must be designed to work in an integrated way, rather than as a collection of isolated parts."
+      },
+      {
+        "name": "Keep it simple and practical",
+        "description": "Always use the minimum number of steps to accomplish an objective."
+      },
+      {
+        "name": "Optimize and automate",
+        "description": "Optimize first, then automate. Human intervention should only happen where it really adds value."
+      }
+    ],
+    "service_value_chain": {
+      "description": "The service value chain is an operating model that outlines the key activities required to respond to demand and facilitate value realization.",
+      "activities": [
+        {
+          "name": "Plan",
+          "purpose": "Ensure a shared understanding of the vision, current status, and improvement direction",
+          "key_inputs": ["Policies and requirements from governing body", "Consolidated demands and opportunities", "Value chain performance information", "Improvement initiatives and plans"],
+          "key_outputs": ["Strategic plans", "Tactical plans", "Operational plans", "Contract and agreement requirements"]
+        },
+        {
+          "name": "Improve", 
+          "purpose": "Ensure continual improvement of products, services, and practices",
+          "key_inputs": ["Product and service performance information", "Performance improvement opportunities", "Knowledge and information about third-party service components"],
+          "key_outputs": ["Improvement initiatives", "Improved products and services", "Performance improvement plans"]
+        },
+        {
+          "name": "Engage",
+          "purpose": "Provide a good understanding of stakeholder needs, transparency, and continual engagement",
+          "key_inputs": ["Product and service requirements", "User feedback", "Incident details and user queries", "Marketing opportunities"],
+          "key_outputs": ["Product and service requirements", "User feedback", "Incident and service request details", "Marketing and communication materials"]
+        },
+        {
+          "name": "Design and transition",
+          "purpose": "Ensure that products and services continually meet stakeholder expectations",
+          "key_inputs": ["Product and service requirements", "Improvement initiatives", "Third-party service requirements", "Knowledge and information"],
+          "key_outputs": ["Service architecture", "Service design packages", "New or changed services", "Knowledge and information"]
+        },
+        {
+          "name": "Obtain/build",
+          "purpose": "Ensure that service components are available when and where needed",
+          "key_inputs": ["Service architecture", "Third-party service requirements", "Improvement initiatives", "Service components"],
+          "key_outputs": ["Service components", "Third-party service components", "Service component information"]
+        },
+        {
+          "name": "Deliver and support",
+          "purpose": "Ensure that services are delivered and supported according to agreed specifications",
+          "key_inputs": ["New/changed products and services", "User queries and feedback", "Incident reports", "Service requests"],
+          "key_outputs": ["Services delivered to users", "Information on service delivery", "Achievement/non-achievement of agreed service levels", "Incident resolution and service request fulfillment"]
+        }
+      ]
+    },
+    "governance": {
+      "description": "The means by which an organization is directed and controlled",
+      "key_elements": ["Evaluate", "Direct", "Monitor"]
+    },
+    "practices": {
+      "general_management_practices": [
+        "Architecture management",
+        "Continual improvement", 
+        "Information security management",
+        "Knowledge management",
+        "Measurement and reporting",
+        "Organizational change management",
+        "Portfolio management",
+        "Project management",
+        "Relationship management",
+        "Risk management",
+        "Service financial management",
+        "Strategy management",
+        "Supplier management",
+        "Workforce and talent management"
+      ],
+      "service_management_practices": [
+        "Availability management",
+        "Business analysis", 
+        "Capacity and performance management",
+        "Change enablement",
+        "Incident management",
+        "IT asset management",
+        "Monitoring and event management",
+        "Problem management",
+        "Release management",
+        "Service catalogue management",
+        "Service configuration management",
+        "Service continuity management",
+        "Service design",
+        "Service desk",
+        "Service level management",
+        "Service request management",
+        "Service validation and testing"
+      ],
+      "technical_management_practices": [
+        "Deployment management",
+        "Infrastructure and platform management",
+        "Software development and management"
+      ]
+    }
+  },
+  "value_streams": {
+    "description": "Value streams define how an organization delivers value to its customers and stakeholders",
+    "examples": [
+      "Incident resolution",
+      "Service request fulfillment", 
+      "Change implementation",
+      "Problem resolution",
+      "Service delivery"
+    ]
+  }
+}

@@ -1,0 +1,233 @@
+{
+  "practice": "Change Enablement (Change Management)",
+  "itil_area": "Service Transition", 
+  "category": "Service Management Practice",
+  "purpose": "To maximize the number of successful service and product changes by ensuring that risks have been properly assessed, authorizing changes to proceed, and managing the change schedule.",
+  "description": "Change enablement ensures that all changes to services and service components are authorized and performed in a controlled manner, minimizing the risk of incidents and ensuring that services continue to meet agreed requirements.",
+  "key_concepts": {
+    "change": "The addition, modification, or removal of anything that could have a direct or indirect effect on services",
+    "change_request": "A description of a proposed change along with details such as what, why, where, when, and how",
+    "change_schedule": "A calendar that shows planned and agreed changes",
+    "emergency_change": "A change that must be implemented urgently to resolve an incident or security issue",
+    "standard_change": "A low-risk, pre-authorized change that is well understood and fully documented"
+  },
+  "scope": [
+    "All changes to service components under organizational control",
+    "Changes to processes, procedures, and documentation", 
+    "Changes to suppliers and supply chains",
+    "Changes to metrics and measurement methods"
+  ],
+  "types_of_changes": {
+    "standard_changes": {
+      "description": "Pre-approved changes that are low risk, relatively common, and follow a procedure",
+      "characteristics": [
+        "Well-understood and documented",
+        "Low risk and proven",
+        "Pre-authorized by change authority",
+        "Follow agreed procedure"
+      ],
+      "examples": [
+        "Password resets",
+        "Standard software installations", 
+        "Adding memory to servers",
+        "User access provisioning"
+      ]
+    },
+    "normal_changes": {
+      "description": "Changes that need to go through the complete change management process",
+      "characteristics": [
+        "Require assessment and authorization",
+        "Scheduled and coordinated",
+        "May have significant impact",
+        "Need change authority approval"
+      ],
+      "examples": [
+        "Infrastructure upgrades",
+        "New service implementations",
+        "Major software updates",
+        "Network configuration changes"
+      ]
+    },
+    "emergency_changes": {
+      "description": "Changes that must be implemented quickly to resolve critical issues",
+      "characteristics": [
+        "Urgent implementation required",
+        "Streamlined approval process",
+        "Higher risk tolerance",
+        "Post-implementation review mandatory"
+      ],
+      "examples": [
+        "Security patches for critical vulnerabilities",
+        "Fixes for service-affecting incidents",
+        "Recovery actions",
+        "Regulatory compliance fixes"
+      ]
+    }
+  },
+  "key_activities": [
+    {
+      "activity": "Change initiation and assessment",
+      "description": "Receive and evaluate change requests for validity and completeness",
+      "sub_activities": [
+        "Validate change request details",
+        "Perform initial risk assessment", 
+        "Determine change type and process",
+        "Assign change request number"
+      ]
+    },
+    {
+      "activity": "Change authorization",
+      "description": "Obtain approval from appropriate change authority",
+      "sub_activities": [
+        "Present change to relevant authority",
+        "Evaluate business justification",
+        "Assess technical feasibility",
+        "Grant or deny authorization"
+      ]
+    },
+    {
+      "activity": "Change planning",
+      "description": "Develop detailed plans for change implementation",
+      "sub_activities": [
+        "Create implementation plan",
+        "Develop rollback procedures",
+        "Schedule change window",
+        "Coordinate with stakeholders"
+      ]
+    },
+    {
+      "activity": "Change implementation",
+      "description": "Execute the planned change according to schedule",
+      "sub_activities": [
+        "Implement change as planned",
+        "Monitor implementation progress",
+        "Document implementation steps",
+        "Communicate status updates"
+      ]
+    },
+    {
+      "activity": "Change review and closure",
+      "description": "Evaluate change success and formally close change record",
+      "sub_activities": [
+        "Verify change objectives met",
+        "Assess any unexpected results",
+        "Update documentation",
+        "Close change record"
+      ]
+    }
+  ],
+  "change_authorities": [
+    {
+      "authority": "Change Authority Board (CAB)",
+      "description": "Group responsible for authorizing changes within their scope",
+      "scope": "Major changes with significant business impact",
+      "membership": ["Business representatives", "Technical experts", "Change manager", "Risk and compliance"]
+    },
+    {
+      "authority": "Emergency Change Advisory Board (ECAB)",
+      "description": "Subset of CAB for urgent change decisions",
+      "scope": "Emergency changes requiring immediate attention",
+      "membership": ["Change manager", "Technical authority", "Business authority"]
+    },
+    {
+      "authority": "Technical Authority",
+      "description": "Individual with expertise in specific technical domain",
+      "scope": "Standard and low-risk technical changes",
+      "membership": ["Subject matter experts", "Team leads"]
+    }
+  ],
+  "inputs": [
+    "Change requests from various sources",
+    "Change proposals from suppliers",
+    "Improvement opportunities",
+    "Incident and problem resolution requirements",
+    "Regulatory and compliance requirements"
+  ],
+  "outputs": [
+    "Authorized changes",
+    "Change schedule",
+    "Change records and documentation", 
+    "Change performance reports",
+    "Lessons learned and improvements"
+  ],
+  "key_metrics": [
+    {
+      "metric": "Change Success Rate",
+      "description": "Percentage of changes implemented successfully without causing incidents",
+      "measurement": "(Successful changes / Total changes) * 100"
+    },
+    {
+      "metric": "Emergency Changes Percentage", 
+      "description": "Percentage of changes classified as emergency",
+      "measurement": "(Emergency changes / Total changes) * 100"
+    },
+    {
+      "metric": "Changes Causing Incidents",
+      "description": "Number of changes that result in incidents",
+      "measurement": "Count of changes linked to subsequent incidents"
+    },
+    {
+      "metric": "Average Change Lead Time",
+      "description": "Time from change request to implementation",
+      "measurement": "Total lead time / Number of changes"
+    },
+    {
+      "metric": "Change Backlog",
+      "description": "Number of pending change requests",
+      "measurement": "Count of approved but not yet implemented changes"
+    }
+  ],
+  "roles_and_responsibilities": {
+    "change_manager": [
+      "Oversee change management process",
+      "Chair change authority meetings",
+      "Maintain change schedule",
+      "Report on change performance"
+    ],
+    "change_requester": [
+      "Submit complete change requests",
+      "Provide business justification", 
+      "Participate in impact assessment",
+      "Support implementation activities"
+    ],
+    "change_implementer": [
+      "Execute approved changes",
+      "Follow implementation procedures",
+      "Provide status updates",
+      "Document implementation results"
+    ],
+    "change_authority": [
+      "Review and authorize changes",
+      "Assess risks and benefits",
+      "Ensure alignment with business strategy",
+      "Monitor change outcomes"
+    ]
+  },
+  "integration_with_practices": {
+    "incident_management": "Changes may be needed to resolve incidents",
+    "problem_management": "Changes implement permanent fixes for problems",
+    "release_management": "Coordinate change implementation with releases",
+    "deployment_management": "Technical implementation of changes",
+    "risk_management": "Assess and manage change-related risks"
+  },
+  "success_factors": [
+    "Clear change categorization and authorization matrix",
+    "Effective change advisory board",
+    "Good relationship between change management and other practices",
+    "Accurate change calendar and scheduling",
+    "Regular measurement and improvement"
+  ],
+  "common_challenges": [
+    "Resistance to change management processes",
+    "Emergency changes bypassing proper authorization",
+    "Poor change impact assessment",
+    "Lack of coordination between changes",
+    "Inadequate change testing and validation"
+  ],
+  "norwegian_context": {
+    "language": "Change documentation and communication in Norwegian",
+    "business_hours": "Changes scheduled around Norwegian business operations", 
+    "regulations": "Compliance with Norwegian regulatory requirements",
+    "cultural_considerations": "Consensus-building approach to change authorization"
+  }
+}

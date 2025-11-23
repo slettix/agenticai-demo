@@ -1,0 +1,185 @@
+{
+  "practice": "Incident Management",
+  "itil_area": "Service Operation",
+  "category": "Service Management Practice",
+  "purpose": "To restore normal service operation as quickly as possible and minimize adverse impact on business operations, thus ensuring that agreed levels of service quality are maintained.",
+  "description": "An incident is an unplanned interruption to a service, or reduction in the quality of a service. The primary objective of incident management is to restore normal operations as quickly as possible with the minimum possible impact on either the business or the user, at a cost-effective price.",
+  "key_concepts": {
+    "incident_definition": "An unplanned interruption to a service, or reduction in the quality of a service",
+    "major_incident": "An incident with high impact and/or high urgency",
+    "incident_model": "A repeatable way of dealing with a particular category of incident",
+    "workaround": "A method to restore service or reduce impact when a full resolution is not available"
+  },
+  "scope": [
+    "All incidents affecting IT services",
+    "Events that may lead to incidents",
+    "Communication with users about service disruptions",
+    "Coordination with other practices"
+  ],
+  "key_activities": [
+    {
+      "activity": "Incident identification and logging",
+      "description": "Detect and record incidents from various sources",
+      "sub_activities": [
+        "Monitor for service disruptions",
+        "Receive user reports via service desk",
+        "Log incident details accurately",
+        "Assign unique incident number"
+      ]
+    },
+    {
+      "activity": "Incident categorization and prioritization",
+      "description": "Classify incidents and determine handling priority",
+      "sub_activities": [
+        "Categorize by service/component affected",
+        "Determine impact and urgency",
+        "Calculate priority matrix",
+        "Apply escalation rules"
+      ]
+    },
+    {
+      "activity": "Initial diagnosis and investigation",
+      "description": "Perform first-level diagnosis to understand the incident",
+      "sub_activities": [
+        "Gather additional information",
+        "Check for known errors",
+        "Attempt immediate resolution",
+        "Document findings"
+      ]
+    },
+    {
+      "activity": "Escalation",
+      "description": "Transfer incident to appropriate support level or management",
+      "sub_activities": [
+        "Functional escalation to specialists",
+        "Hierarchic escalation to management",
+        "Update stakeholders",
+        "Transfer knowledge effectively"
+      ]
+    },
+    {
+      "activity": "Investigation and diagnosis",
+      "description": "Detailed technical investigation to identify root cause",
+      "sub_activities": [
+        "Perform detailed analysis",
+        "Collaborate with other teams",
+        "Use diagnostic tools",
+        "Document investigation steps"
+      ]
+    },
+    {
+      "activity": "Resolution and recovery",
+      "description": "Implement solution and restore service operation",
+      "sub_activities": [
+        "Implement resolution or workaround",
+        "Verify service restoration",
+        "Update configuration items if needed",
+        "Document resolution steps"
+      ]
+    },
+    {
+      "activity": "Incident closure",
+      "description": "Formally close incident and ensure satisfaction",
+      "sub_activities": [
+        "Confirm resolution with user",
+        "Update incident record",
+        "Close incident ticket",
+        "Conduct satisfaction survey"
+      ]
+    }
+  ],
+  "inputs": [
+    "Monitoring and event management alerts",
+    "User reports of service issues", 
+    "Service requests that reveal incidents",
+    "Suppliers notifications",
+    "Other practices notifications"
+  ],
+  "outputs": [
+    "Resolved incidents",
+    "Incident records and documentation",
+    "Problem records for underlying issues",
+    "Change requests for permanent fixes",
+    "Knowledge for future incidents"
+  ],
+  "key_metrics": [
+    {
+      "metric": "Mean Time to Resolve (MTTR)",
+      "description": "Average time to resolve incidents",
+      "measurement": "Total resolution time / Number of resolved incidents"
+    },
+    {
+      "metric": "First Call Resolution Rate",
+      "description": "Percentage of incidents resolved at first contact",
+      "measurement": "(Incidents resolved at first contact / Total incidents) * 100"
+    },
+    {
+      "metric": "Customer Satisfaction Score",
+      "description": "User satisfaction with incident resolution",
+      "measurement": "Average rating from satisfaction surveys"
+    },
+    {
+      "metric": "Incident Volume",
+      "description": "Number of incidents in a given period",
+      "measurement": "Count of incidents by time period"
+    },
+    {
+      "metric": "Resolution Time by Priority",
+      "description": "Average resolution time segmented by incident priority",
+      "measurement": "MTTR calculated separately for each priority level"
+    }
+  ],
+  "roles_and_responsibilities": {
+    "service_desk": [
+      "Log and categorize incidents",
+      "Provide first-level support",
+      "Escalate when necessary",
+      "Communicate with users"
+    ],
+    "incident_manager": [
+      "Oversee incident management process",
+      "Manage major incidents",
+      "Coordinate resolution efforts",
+      "Report on incident metrics"
+    ],
+    "technical_teams": [
+      "Investigate and resolve incidents",
+      "Provide subject matter expertise",
+      "Implement fixes and workarounds",
+      "Document technical solutions"
+    ],
+    "suppliers": [
+      "Support for third-party components",
+      "Escalation point for supplier issues",
+      "Provide status updates",
+      "Implement supplier-side fixes"
+    ]
+  },
+  "integration_with_practices": {
+    "problem_management": "Identify underlying causes of recurring incidents",
+    "change_enablement": "Implement permanent fixes through changes",
+    "service_desk": "First point of contact for incident reporting",
+    "monitoring_and_event_management": "Early detection of potential incidents",
+    "knowledge_management": "Access to solutions and workarounds"
+  },
+  "success_factors": [
+    "Clear incident categorization and prioritization scheme",
+    "Effective escalation procedures",
+    "Skilled and trained support staff",
+    "Good integration with monitoring tools",
+    "Regular review and improvement of processes"
+  ],
+  "common_challenges": [
+    "Inadequate incident categorization leading to misrouting",
+    "Poor communication with users during resolution",
+    "Lack of integration between tools and processes",
+    "Insufficient knowledge management",
+    "Ineffective escalation procedures"
+  ],
+  "norwegian_context": {
+    "language": "All incident communications should be in Norwegian",
+    "business_hours": "Normal Norwegian business hours (08:00-16:00)",
+    "regulations": "Compliance with Norwegian data protection laws",
+    "cultural_considerations": "Direct communication style preferred"
+  }
+}

@@ -134,7 +134,13 @@ class JobQueue:
                     
                     # Process the job
                     if job.agent_type == "process_generator":
-                        result = await agent.generate_process(job.request_data, self._update_job_progress(job))
+                        # Check if ITIL enhancement is requested
+                        if job.request_data.get("itil_area"):
+                            result = await agent.generate_itil_process(job.request_data, self._update_job_progress(job))
+                        else:
+                            result = await agent.generate_process(job.request_data, self._update_job_progress(job))
+                    elif job.agent_type == "itil_process_generator":
+                        result = await agent.generate_itil_process(job.request_data, self._update_job_progress(job))
                     elif job.agent_type == "revision_agent":
                         result = await agent.revise_process(job.request_data, self._update_job_progress(job))
                     elif job.agent_type == "document_classifier":

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { prosessService } from '../../services/prosessService';
+import { ProcessStepBuilder, ProcessStep } from './ProcessStepBuilder';
 import './CreateProsessForm.css';
 
 interface CreateProsessFormProps {
@@ -42,6 +43,9 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
     priority: 'Medium',
     tags: ''
   });
+  
+  const [processSteps, setProcessSteps] = useState<ProcessStep[]>([]);
+  const [stepBuilderMode, setStepBuilderMode] = useState<'manual' | 'ai' | 'template'>('manual');
   
   const [categories, setCategories] = useState<ProsessCategories | null>(null);
   const [templates, setTemplates] = useState<ITILTemplate[]>([]);
@@ -117,7 +121,9 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
         category: formData.category,
         itilArea: formData.itilArea || undefined,
         priority: formData.priority,
-        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : undefined
+        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : undefined,
+        processSteps: stepBuilderMode === 'manual' ? processSteps : undefined,
+        stepBuilderMode
       };
 
       const newProsess = await prosessService.createProsess(requestData);
@@ -143,7 +149,7 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
   };
 
   const hasUnsavedChanges = () => {
-    return formData.title || formData.description || formData.category || formData.itilArea || formData.tags;
+    return formData.title || formData.description || formData.category || formData.itilArea || formData.tags || processSteps.length > 0;
   };
 
   if (!categories) {
@@ -303,6 +309,87 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
               Skill tags med komma. Eksempler: kritisk, automatisert, manuell, kundevendt
             </small>
           </div>
+        </div>
+
+        {/* Process Steps Builder */}
+        <div className="form-section">
+          <h3>Prosesstrinn</h3>
+          
+          <div className="step-builder-options">
+            <div className="builder-mode-selector">
+              <label>Velg metode for å bygge prosesstrinn:</label>
+              <div className="mode-buttons">
+                <button
+                  type="button"
+                  className={`mode-btn ${stepBuilderMode === 'manual' ? 'active' : ''}`}
+                  onClick={() => setStepBuilderMode('manual')}
+                >
+                  🔧 Manuell bygging
+                </button>
+                <button
+                  type="button"
+                  className={`mode-btn ${stepBuilderMode === 'ai' ? 'active' : ''}`}
+                  onClick={() => setStepBuilderMode('ai')}
+                >
+                  🤖 AI-generert
+                </button>
+                {selectedTemplate && (
+                  <button
+                    type="button"
+                    className={`mode-btn ${stepBuilderMode === 'template' ? 'active' : ''}`}
+                    onClick={() => setStepBuilderMode('template')}
+                  >
+                    📋 Fra mal ({selectedTemplate.name})
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {stepBuilderMode === 'manual' && (
+            <ProcessStepBuilder
+              steps={processSteps}
+              onStepsChange={setProcessSteps}
+              itilArea={formData.itilArea}
+            />
+          )}
+
+          {stepBuilderMode === 'ai' && (
+            <div className="ai-generation-info">
+              <p>🤖 <strong>AI-generering:</strong> Prosesstrinn vil bli generert automatisk basert på prosessinformasjonen når du oppretter prosessen.</p>
+              <div className="ai-preview">
+                <h4>AI vil generere trinn basert på:</h4>
+                <ul>
+                  <li>Prosesstittel: <strong>{formData.title || 'Ikke spesifisert'}</strong></li>
+                  <li>Kategori: <strong>{formData.category || 'Ikke spesifisert'}</strong></li>
+                  {formData.itilArea && <li>ITIL-område: <strong>{formData.itilArea}</strong></li>}
+                  {selectedTemplate && <li>Mal: <strong>{selectedTemplate.name}</strong></li>}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {stepBuilderMode === 'template' && selectedTemplate && (
+            <div className="template-steps-preview">
+              <h4>📋 Forhåndsdefinerte trinn fra {selectedTemplate.name}</h4>
+              <div className="template-steps">
+                {selectedTemplate.defaultSteps.map((step: any, index: number) => (
+                  <div key={index} className="template-step">
+                    <span className="step-number">{index + 1}</span>
+                    <div className="step-content">
+                      <h5>{step.title}</h5>
+                      <p>{step.description}</p>
+                      <div className="step-meta">
+                        <span>👤 {step.responsible_role}</span>
+                        <span>⏱️ {step.estimated_duration} min</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p><small>💡 Disse trinnene vil bli brukt som utgangspunkt når prosessen opprettes.</small></p>
+            </div>
+          )}
         </div>
 
         {/* Error handling */}
