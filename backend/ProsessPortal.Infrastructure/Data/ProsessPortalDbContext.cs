@@ -249,6 +249,31 @@ public class ProsessPortalDbContext : DbContext
             new RolePermission { RoleId = 5, PermissionId = 1 }    // view_prosess
         );
         
+        // Seed admin user
+        modelBuilder.Entity<User>().HasData(
+            new User 
+            { 
+                Id = 1,
+                Username = "admin",
+                Email = "admin@prosessportal.no",
+                PasswordHash = "$2a$11$N8gNZ4Hg/JQXS4PZH6YX6e3rR5Zf6KjV8W5Qf2S4h3G6Yq9Pb7Ed", // admin123
+                FirstName = "System",
+                LastName = "Administrator",
+                IsActive = true,
+                CreatedAt = new DateTime(2025, 11, 23, 17, 0, 0, DateTimeKind.Utc)
+            }
+        );
+        
+        // Seed admin user role assignment
+        modelBuilder.Entity<UserRole>().HasData(
+            new UserRole 
+            { 
+                UserId = 1,
+                RoleId = 1, // Admin role
+                AssignedAt = new DateTime(2025, 11, 23, 17, 0, 0, DateTimeKind.Utc)
+            }
+        );
+        
         // Seed sample processes
         SeedSampleProsesses(modelBuilder);
     }
@@ -256,6 +281,8 @@ public class ProsessPortalDbContext : DbContext
     private void SeedSampleProsesses(ModelBuilder modelBuilder)
     {
         // Sample processes for demonstration
+        var baseDate = new DateTime(2025, 11, 23, 17, 0, 0, DateTimeKind.Utc);
+        
         modelBuilder.Entity<Prosess>().HasData(
             new Prosess 
             { 
@@ -264,8 +291,8 @@ public class ProsessPortalDbContext : DbContext
                 Description = "Komplett prosess for å ta imot nye medarbeidere",
                 Category = ProsessCategories.HR,
                 Status = ProsessStatus.Published,
-                CreatedAt = DateTime.UtcNow.AddDays(-30),
-                UpdatedAt = DateTime.UtcNow.AddDays(-5),
+                CreatedAt = baseDate.AddDays(-30),
+                UpdatedAt = baseDate.AddDays(-5),
                 CreatedByUserId = 1,
                 IsActive = true,
                 ViewCount = 25
@@ -277,8 +304,8 @@ public class ProsessPortalDbContext : DbContext
                 Description = "Prosess for bestilling av nytt IT-utstyr til medarbeidere",
                 Category = ProsessCategories.IT,
                 Status = ProsessStatus.Published,
-                CreatedAt = DateTime.UtcNow.AddDays(-45),
-                UpdatedAt = DateTime.UtcNow.AddDays(-10),
+                CreatedAt = baseDate.AddDays(-45),
+                UpdatedAt = baseDate.AddDays(-10),
                 CreatedByUserId = 1,
                 IsActive = true,
                 ViewCount = 18
@@ -290,8 +317,8 @@ public class ProsessPortalDbContext : DbContext
                 Description = "Standard prosess for håndtering og godkjenning av fakturaer",
                 Category = ProsessCategories.Finance,
                 Status = ProsessStatus.Published,
-                CreatedAt = DateTime.UtcNow.AddDays(-20),
-                UpdatedAt = DateTime.UtcNow.AddDays(-2),
+                CreatedAt = baseDate.AddDays(-20),
+                UpdatedAt = baseDate.AddDays(-2),
                 CreatedByUserId = 1,
                 IsActive = true,
                 ViewCount = 42
@@ -303,8 +330,8 @@ public class ProsessPortalDbContext : DbContext
                 Description = "Håndtering av kundehenvendelser i support-system",
                 Category = ProsessCategories.CustomerService,
                 Status = ProsessStatus.InReview,
-                CreatedAt = DateTime.UtcNow.AddDays(-7),
-                UpdatedAt = DateTime.UtcNow.AddDays(-1),
+                CreatedAt = baseDate.AddDays(-7),
+                UpdatedAt = baseDate.AddDays(-1),
                 CreatedByUserId = 1,
                 IsActive = true,
                 ViewCount = 8
