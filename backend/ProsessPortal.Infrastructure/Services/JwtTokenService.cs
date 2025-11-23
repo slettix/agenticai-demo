@@ -20,7 +20,7 @@ public class JwtTokenService : IJwtTokenService
     public JwtTokenService(IConfiguration configuration)
     {
         _configuration = configuration;
-        _jwtSecret = _configuration["Jwt:Secret"] ?? "default-secret-key-for-development-only";
+        _jwtSecret = _configuration["Jwt:Secret"] ?? "default-secret-key-for-development-only-please-change-in-production";
         _jwtIssuer = _configuration["Jwt:Issuer"] ?? "ProsessPortal";
         _jwtAudience = _configuration["Jwt:Audience"] ?? "ProsessPortal";
         _jwtExpiryMinutes = int.Parse(_configuration["Jwt:ExpiryMinutes"] ?? "60");

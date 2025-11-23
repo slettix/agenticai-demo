@@ -63,7 +63,8 @@ builder.Services.AddDbContext<ProsessPortalDbContext>(options =>
     }
     else
     {
-        options.UseSqlServer(connectionString);
+        // Use PostgreSQL for production/development with connection string
+        options.UseNpgsql(connectionString);
     }
 });
 
@@ -128,39 +129,73 @@ builder.Services.AddScoped<IAgentService, AgentService>();
 
 var app = builder.Build();
 
-// Seed database
+// Initialize database
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ProsessPortalDbContext>();
-    context.Database.EnsureCreated();
     
-    // Seed admin user if not exists
-    if (!context.Users.Any())
+    try 
     {
-        var adminRole = context.Roles.First(r => r.Name == "Admin");
-        var adminUser = new ProsessPortal.Core.Entities.User
+        // Create tables if they don't exist and seed default data
+        bool created = context.Database.EnsureCreated();
+        if (created)
         {
-            Username = "admin",
-            Email = "admin@prosessportal.no",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-            FirstName = "System",
-            LastName = "Administrator",
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
-        
-        context.Users.Add(adminUser);
-        context.SaveChanges();
-        
-        context.UserRoles.Add(new ProsessPortal.Core.Entities.UserRole
+            Log.Information("Database schema created and seeded successfully");
+        }
+        else
         {
-            UserId = adminUser.Id,
-            RoleId = adminRole.Id,
-            AssignedAt = DateTime.UtcNow
-        });
-        context.SaveChanges();
-        
-        Log.Information("Created default admin user: admin/admin123");
+            Log.Information("Database already exists - checking admin user");
+        }
+
+        // Ensure admin user exists with correct password hash
+        var adminUser = context.Users.FirstOrDefault(u => u.Username == "admin");
+        if (adminUser == null)
+        {
+            var adminRole = context.Roles.First(r => r.Name == "Admin");
+            adminUser = new ProsessPortal.Core.Entities.User
+            {
+                Username = "admin",
+                Email = "admin@prosessportal.no",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                FirstName = "System",
+                LastName = "Administrator",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            
+            context.Users.Add(adminUser);
+            context.SaveChanges();
+            
+            context.UserRoles.Add(new ProsessPortal.Core.Entities.UserRole
+            {
+                UserId = adminUser.Id,
+                RoleId = adminRole.Id,
+                AssignedAt = DateTime.UtcNow
+            });
+            context.SaveChanges();
+            
+            Log.Information("Created admin user with correct password hash");
+        }
+        else
+        {
+            // Update password hash if it's the old incorrect one
+            var testPassword = "admin123";
+            if (!BCrypt.Net.BCrypt.Verify(testPassword, adminUser.PasswordHash))
+            {
+                adminUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(testPassword);
+                context.SaveChanges();
+                Log.Information("Updated admin user password hash");
+            }
+            else
+            {
+                Log.Information("Admin user password hash is correct");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Failed to initialize database");
+        throw;
     }
 }
 

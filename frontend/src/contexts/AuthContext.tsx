@@ -81,7 +81,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const hasRole = (role: string): boolean => {
-    return user?.roles.includes(role) ?? false;
+    if (!user) return false;
+    
+    // Admin has access to all roles
+    if (user.roles.includes('Admin')) {
+      return true;
+    }
+    
+    return user.roles.includes(role);
   };
 
   const value: AuthContextType = {
