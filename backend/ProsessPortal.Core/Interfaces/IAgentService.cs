@@ -10,4 +10,10 @@ public interface IAgentService
     Task<ProcessGenerationResult?> GetGenerationResultAsync(string jobId);
     Task<ProcessRevisionResult?> GetRevisionResultAsync(string jobId);
     Task<bool> IsAgentServiceAvailableAsync();
+
+    // Epic 3: AI-driven Process Automation
+    Task<AgentJobResponse> ClassifyDocumentAsync(object requestData, string userId);
+    Task<AgentJobResponse> OptimizeProcessAsync(object requestData, string userId);
+    Task<DocumentClassificationResult?> GetClassificationResultAsync(string jobId);
+    Task<ProcessOptimizationResult?> GetOptimizationResultAsync(string jobId);
 }

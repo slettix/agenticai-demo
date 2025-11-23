@@ -96,14 +96,20 @@ class JobQueue:
         """Worker coroutine that processes jobs from the queue"""
         from agents.process_generator import ProcessGeneratorAgent
         from agents.revision_agent import RevisionAgent
+        from agents.document_classifier import DocumentClassifierAgent
+        from agents.process_optimizer import ProcessOptimizerAgent
         
         # Initialize agents
         process_generator = ProcessGeneratorAgent()
         revision_agent = RevisionAgent()
+        document_classifier = DocumentClassifierAgent()
+        process_optimizer = ProcessOptimizerAgent()
         
         agents = {
             "process_generator": process_generator,
-            "revision_agent": revision_agent
+            "revision_agent": revision_agent,
+            "document_classifier": document_classifier,
+            "process_optimizer": process_optimizer
         }
 
         print("🤖 Job queue worker started")
@@ -131,6 +137,10 @@ class JobQueue:
                         result = await agent.generate_process(job.request_data, self._update_job_progress(job))
                     elif job.agent_type == "revision_agent":
                         result = await agent.revise_process(job.request_data, self._update_job_progress(job))
+                    elif job.agent_type == "document_classifier":
+                        result = await agent.classify_document(job.request_data, self._update_job_progress(job))
+                    elif job.agent_type == "process_optimizer":
+                        result = await agent.analyze_process_performance(job.request_data, self._update_job_progress(job))
                     else:
                         raise ValueError(f"Unsupported agent type: {job.agent_type}")
                     

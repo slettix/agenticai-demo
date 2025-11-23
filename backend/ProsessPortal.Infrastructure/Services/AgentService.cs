@@ -244,4 +244,158 @@ public class AgentService : IAgentService
             return false;
         }
     }
+
+    // Epic 3: AI-driven Process Automation Methods
+
+    public async Task<AgentJobResponse> ClassifyDocumentAsync(object requestData, string userId)
+    {
+        try
+        {
+            _logger.LogInformation("Submitting document classification request for user {UserId}", userId);
+
+            var json = JsonSerializer.Serialize(requestData, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            });
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"{_agentServiceBaseUrl}/api/agents/classify-document", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var jobResponse = JsonSerializer.Deserialize<AgentJobResponse>(responseJson, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                });
+
+                _logger.LogInformation("Document classification job submitted with ID: {JobId}", jobResponse?.JobId);
+                return jobResponse ?? throw new Exception("Invalid response from agent service");
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Agent service returned error: {StatusCode} - {Error}", response.StatusCode, errorContent);
+                throw new Exception($"Agent service error: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to submit document classification request");
+            throw;
+        }
+    }
+
+    public async Task<AgentJobResponse> OptimizeProcessAsync(object requestData, string userId)
+    {
+        try
+        {
+            _logger.LogInformation("Submitting process optimization request for user {UserId}", userId);
+
+            var json = JsonSerializer.Serialize(requestData, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            });
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"{_agentServiceBaseUrl}/api/agents/optimize-process", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var jobResponse = JsonSerializer.Deserialize<AgentJobResponse>(responseJson, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                });
+
+                _logger.LogInformation("Process optimization job submitted with ID: {JobId}", jobResponse?.JobId);
+                return jobResponse ?? throw new Exception("Invalid response from agent service");
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Agent service returned error: {StatusCode} - {Error}", response.StatusCode, errorContent);
+                throw new Exception($"Agent service error: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to submit process optimization request");
+            throw;
+        }
+    }
+
+    public async Task<DocumentClassificationResult?> GetClassificationResultAsync(string jobId)
+    {
+        try
+        {
+            _logger.LogDebug("Getting classification result for job {JobId}", jobId);
+
+            var response = await _httpClient.GetAsync($"{_agentServiceBaseUrl}/api/jobs/{jobId}/result");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<DocumentClassificationResult>(responseJson, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                });
+
+                return result;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                _logger.LogWarning("Classification result for job {JobId} not found", jobId);
+                return null;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Failed to get classification result: {StatusCode} - {Error}", response.StatusCode, errorContent);
+                throw new Exception($"Failed to get classification result: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting classification result for job {JobId}", jobId);
+            throw;
+        }
+    }
+
+    public async Task<ProcessOptimizationResult?> GetOptimizationResultAsync(string jobId)
+    {
+        try
+        {
+            _logger.LogDebug("Getting optimization result for job {JobId}", jobId);
+
+            var response = await _httpClient.GetAsync($"{_agentServiceBaseUrl}/api/jobs/{jobId}/result");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<ProcessOptimizationResult>(responseJson, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                });
+
+                return result;
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                _logger.LogWarning("Optimization result for job {JobId} not found", jobId);
+                return null;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Failed to get optimization result: {StatusCode} - {Error}", response.StatusCode, errorContent);
+                throw new Exception($"Failed to get optimization result: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting optimization result for job {JobId}", jobId);
+            throw;
+        }
+    }
 }
