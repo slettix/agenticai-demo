@@ -11,6 +11,9 @@ public interface IProsessService
     Task<bool> DeleteProsessAsync(int id, int userId);
     Task<ProsessStatisticsDto> GetProsessStatisticsAsync();
     Task<ICollection<string>> GetCategoriesAsync();
+    Task<ProsessCategoriesDto> GetCategoriesWithITILAsync();
+    Task<ICollection<ITILAreaDto>> GetITILAreasAsync();
+    Task<ICollection<ITILProcessTemplateDto>> GetITILTemplatesAsync(string? area = null);
     Task<ICollection<ProsessTagDto>> GetTagsAsync();
     Task<bool> RecordProsessViewAsync(int prosessId);
 }

@@ -5,9 +5,10 @@ import { useAuth } from '../../contexts/AuthContext.tsx';
 
 interface ProsessListeProps {
   onProsessClick: (prosessId: number) => void;
+  onCreateProsess?: () => void;
 }
 
-export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick }) => {
+export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCreateProsess }) => {
   const { hasPermission } = useAuth();
   const [prosesses, setProsesses] = useState<PagedResult<ProsessListItem>>({
     items: [],
@@ -120,6 +121,19 @@ export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick }) =>
 
   return (
     <div className="prosess-liste">
+      <div className="prosess-liste-header">
+        <h2>📋 Prosessportal</h2>
+        {hasPermission('create_prosess') && onCreateProsess && (
+          <button
+            onClick={onCreateProsess}
+            className="btn-create-prosess"
+            title="Opprett ny prosess"
+          >
+            ➕ Ny prosess
+          </button>
+        )}
+      </div>
+      
       <div className="search-filters">
         <div className="search-bar">
           <input

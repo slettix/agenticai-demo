@@ -117,6 +117,9 @@ export interface CreateProsessRequest {
   title: string;
   description: string;
   category: string;
+  itilArea?: string;
+  priority?: string;
+  ownerId?: number;
   tags?: string[];
 }
 
@@ -124,6 +127,9 @@ export interface UpdateProsessRequest {
   title: string;
   description: string;
   category: string;
+  itilArea?: string;
+  priority?: string;
+  ownerId?: number;
   tags?: string[];
 }
 

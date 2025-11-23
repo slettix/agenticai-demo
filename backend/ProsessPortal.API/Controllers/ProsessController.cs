@@ -168,17 +168,47 @@ public class ProsessController : ControllerBase
     }
 
     [HttpGet("categories")]
-    public async Task<ActionResult<ICollection<string>>> GetCategories()
+    public async Task<ActionResult<ProsessCategoriesDto>> GetCategories()
     {
         try
         {
-            var categories = await _prosessService.GetCategoriesAsync();
+            var categories = await _prosessService.GetCategoriesWithITILAsync();
             return Ok(categories);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting categories");
             return StatusCode(500, "En feil oppstod under henting av kategorier");
+        }
+    }
+
+    [HttpGet("itil/areas")]
+    public async Task<ActionResult<ICollection<ITILAreaDto>>> GetITILAreas()
+    {
+        try
+        {
+            var areas = await _prosessService.GetITILAreasAsync();
+            return Ok(areas);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting ITIL areas");
+            return StatusCode(500, "En feil oppstod under henting av ITIL-områder");
+        }
+    }
+
+    [HttpGet("itil/templates")]
+    public async Task<ActionResult<ICollection<ITILProcessTemplateDto>>> GetITILTemplates([FromQuery] string? area = null)
+    {
+        try
+        {
+            var templates = await _prosessService.GetITILTemplatesAsync(area);
+            return Ok(templates);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting ITIL templates");
+            return StatusCode(500, "En feil oppstod under henting av ITIL-maler");
         }
     }
 

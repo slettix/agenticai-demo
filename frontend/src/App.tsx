@@ -5,6 +5,7 @@ import { RegisterForm } from './components/auth/RegisterForm.tsx';
 import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
 import { ProsessListe } from './components/prosess/ProsessListe.tsx';
 import { ProsessDetaljer } from './components/prosess/ProsessDetaljer.tsx';
+import { CreateProsessForm } from './components/prosess/CreateProsessForm.tsx';
 import './components/auth/auth.css';
 import './components/prosess/prosess.css';
 import './App.css';
@@ -13,7 +14,7 @@ import './App.css';
 const AppContent: React.FC = () => {
   const { user, logout, hasRole } = useAuth();
   const [showRegister, setShowRegister] = useState(false);
-  const [currentView, setCurrentView] = useState<'prosesser' | 'prosess-detail'>('prosesser');
+  const [currentView, setCurrentView] = useState<'prosesser' | 'prosess-detail' | 'create-prosess'>('prosesser');
   const [selectedProsessId, setSelectedProsessId] = useState<number | null>(null);
 
   if (!user) {
@@ -70,7 +71,7 @@ const AppContent: React.FC = () => {
           </li>
           
           <ProtectedRoute requiredRole="QA">
-            <li><a href="#qa-ko">✅ QA-kø</a></li>
+            <li><a href="#qa-ko">✅ Til godkjenning</a></li>
           </ProtectedRoute>
           
           <ProtectedRoute requiredRole="ProsessEier">
@@ -90,6 +91,7 @@ const AppContent: React.FC = () => {
               setSelectedProsessId(prosessId);
               setCurrentView('prosess-detail');
             }}
+            onCreateProsess={() => setCurrentView('create-prosess')}
           />
         )}
         
@@ -97,6 +99,16 @@ const AppContent: React.FC = () => {
           <ProsessDetaljer 
             prosessId={selectedProsessId}
             onBack={() => setCurrentView('prosesser')}
+          />
+        )}
+        
+        {currentView === 'create-prosess' && (
+          <CreateProsessForm 
+            onSuccess={(prosessId) => {
+              setSelectedProsessId(prosessId);
+              setCurrentView('prosess-detail');
+            }}
+            onCancel={() => setCurrentView('prosesser')}
           />
         )}
       </main>

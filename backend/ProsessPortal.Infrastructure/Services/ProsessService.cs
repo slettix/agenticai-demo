@@ -326,6 +326,111 @@ public class ProsessService : IProsessService
         return true;
     }
 
+    public async Task<ProsessCategoriesDto> GetCategoriesWithITILAsync()
+    {
+        var businessCategories = await GetCategoriesAsync();
+        var itilAreas = await GetITILAreasAsync();
+        var priorities = new[] { "Lav", "Medium", "Høy", "Kritisk" };
+
+        return new ProsessCategoriesDto(
+            businessCategories,
+            itilAreas,
+            priorities
+        );
+    }
+
+    public async Task<ICollection<ITILAreaDto>> GetITILAreasAsync()
+    {
+        // ITIL 4 Service Value Chain areas
+        return await Task.FromResult(new List<ITILAreaDto>
+        {
+            new("Service Strategy", 
+                "Strategisk tilnærming til service management og forretningsverdi",
+                new[] { "Service Portfolio Management", "Financial Management", "Demand Management", "Business Relationship Management" }),
+            
+            new("Service Design", 
+                "Design av IT-tjenester og støtteprosesser for å møte forretningsbehov",
+                new[] { "Service Level Management", "Capacity Management", "Availability Management", "IT Service Continuity Management", "Information Security Management" }),
+            
+            new("Service Transition", 
+                "Kontrollert overgang fra design til produksjon",
+                new[] { "Change Management", "Service Asset & Configuration Management", "Release & Deployment Management", "Knowledge Management" }),
+            
+            new("Service Operation", 
+                "Daglig drift og vedlikehold av IT-tjenester",
+                new[] { "Incident Management", "Problem Management", "Event Management", "Access Management", "Request Fulfillment" }),
+            
+            new("Continual Service Improvement", 
+                "Kontinuerlig forbedring av tjenester og prosesser",
+                new[] { "Service Measurement & Reporting", "Service Improvement Planning", "ROI Analysis" })
+        });
+    }
+
+    public async Task<ICollection<ITILProcessTemplateDto>> GetITILTemplatesAsync(string? area = null)
+    {
+        var templates = new List<ITILProcessTemplateDto>
+        {
+            new("Incident Management",
+                "Service Operation",
+                "Gjenopprette normal tjenesteproduksjon så raskt som mulig og minimere negative konsekvenser for forretningen",
+                "Håndtering av alle hendelser som forstyrrer eller kan forstyrre normal tjenesteproduksjon",
+                new[] { "Identifikasjon og registrering", "Kategorisering og prioritering", "Undersøkelse og diagnose", "Løsning og gjenoppretting", "Lukking" },
+                new[] { "Hendelsesrapport", "Overvåkingsdata", "Brukerhenvendelser" },
+                new[] { "Løst hendelse", "Problemrapport", "Endringsbehov", "Kunnskapsdatabase-oppføring" },
+                new[] { "Mean Time to Resolve (MTTR)", "First Call Resolution Rate", "Customer Satisfaction Score", "Incident Volume" },
+                new List<CreateProsessStepRequest>
+                {
+                    new("Hendelse identifisert og registrert", "Identifiser og registrer hendelsen i ITSM-verktøy", "Fyll ut alle obligatoriske felt i hendelsesregistrering", 1, StepType.Task, "Service Desk", 5, false, null),
+                    new("Kategorisering og prioritering", "Kategoriser hendelsen og sett prioritet basert på påvirkning og hastighet", "Bruk kategoriseringsmatrise for å bestemme riktig prioritet", 2, StepType.Decision, "Service Desk", 10, false, null),
+                    new("Første nivå støtte", "Forsøk å løse hendelsen på første nivå", "Følg kjente prosedyrer og søk i kunnskapsdatabase", 3, StepType.Task, "Service Desk", 15, false, null),
+                    new("Eskalering hvis nødvendig", "Eskaler til andre nivå hvis hendelsen ikke kan løses", "Eskalering basert på prioritet og kompleksitet", 4, StepType.Decision, "Service Desk", 5, true, null),
+                    new("Hendelse løst og lukket", "Bekreft løsning med bruker og lukk hendelsen", "Få bekreftelse fra bruker før lukking", 5, StepType.Task, "Service Desk", 10, false, null)
+                }),
+
+            new("Change Management",
+                "Service Transition", 
+                "Kontrollere livssyklusen til alle endringer for å muliggjøre fordelaktige endringer med minimum risiko",
+                "Standardisert metode og prosedyre for effektiv og rask håndtering av alle endringer",
+                new[] { "Endringsplanlegging", "Endringsautorisering", "Endringsimplementering", "Evaluering" },
+                new[] { "Endringsbehov", "RFC (Request for Change)", "Endringsplan" },
+                new[] { "Autorisert endring", "Implementert endring", "Endringsrapport" },
+                new[] { "Change Success Rate", "Emergency Changes Percentage", "Changes Causing Incidents", "Average Change Lead Time" },
+                new List<CreateProsessStepRequest>
+                {
+                    new("RFC opprettelse", "Opprett Request for Change (RFC)", "Fyll ut alle nødvendige detaljer i RFC-skjema", 1, StepType.Document, "Change Requester", 30, false, null),
+                    new("Endringsvurdering", "Vurder risiko, påvirkning og ressursbehov", "Utfør impact assessment og risk analysis", 2, StepType.Task, "Change Manager", 60, false, null),
+                    new("CAB gjennomgang", "Change Advisory Board gjennomgang og godkjenning", "Presenter endringen for CAB og få godkjenning", 3, StepType.Approval, "Change Advisory Board", 120, false, null),
+                    new("Implementeringsplanlegging", "Planlegg implementering og tilbakerulle-plan", "Detaljert plan for implementering og tilbakerulle", 4, StepType.Task, "Change Manager", 90, false, null),
+                    new("Implementering", "Gjennomfør endringen i henhold til plan", "Følg implementeringsplan nøye og dokumenter prosess", 5, StepType.Task, "Implementation Team", 180, false, null),
+                    new("Post-implementation review", "Evaluér endringen og dokumenter resultater", "Vurder om endringen var vellykket og lærdom", 6, StepType.Task, "Change Manager", 45, false, null)
+                }),
+
+            new("Problem Management", 
+                "Service Operation",
+                "Redusere sannsynligheten for og påvirkningen av hendelser ved å identifisere faktiske og potensielle årsaker",
+                "Proaktiv identifikasjon og reaktiv løsning av problemer og kjente feil",
+                new[] { "Problemidentifikasjon", "Problemkontroll", "Feilkontroll" },
+                new[] { "Hendelsesdata", "Overvåkingsdata", "Problemrapporter" },
+                new[] { "Løst problem", "Kjent feil", "Endringsbehov", "Problemrapport" },
+                new[] { "Problem Resolution Time", "Problem Prevention Rate", "Known Error Success Rate" },
+                new List<CreateProsessStepRequest>
+                {
+                    new("Problemidentifikasjon", "Identifiser og registrer problemet", "Analyser hendelsesmønstre for å identifisere underliggende problemer", 1, StepType.Task, "Problem Manager", 30, false, null),
+                    new("Problemkategorisering", "Kategoriser og prioriter problemet", "Klassifiser problem basert på påvirkning og hastighet", 2, StepType.Decision, "Problem Manager", 15, false, null),
+                    new("Undersøkelse og diagnose", "Utfør detaljert undersøkelse av problemet", "Bruk problemløsningsmetoder for å finne rotårsak", 3, StepType.Task, "Technical Team", 240, false, null),
+                    new("Workaround dokumentering", "Dokumenter midlertidige løsninger", "Opprett kjent feil-oppføring med workaround", 4, StepType.Document, "Problem Manager", 45, true, null),
+                    new("Problemløsning", "Implementer permanent løsning", "Utarbeid RFC for permanent løsning", 5, StepType.Task, "Technical Team", 360, false, null)
+                })
+        };
+
+        if (!string.IsNullOrEmpty(area))
+        {
+            templates = templates.Where(t => t.ITILArea.Equals(area, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        return await Task.FromResult(templates);
+    }
+
     private static ICollection<ProsessStepDto> MapStepsToDto(List<ProsessStep> steps)
     {
         return steps.Select(s => new ProsessStepDto(

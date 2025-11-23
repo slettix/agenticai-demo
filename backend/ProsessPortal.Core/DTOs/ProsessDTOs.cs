@@ -93,6 +93,9 @@ public record CreateProsessRequest(
     string Title,
     string Description,
     string Category,
+    string? ITILArea = null,
+    string? Priority = null,
+    int? OwnerId = null,
     ICollection<string>? Tags = null
 );
 
@@ -100,6 +103,9 @@ public record UpdateProsessRequest(
     string Title,
     string Description,
     string Category,
+    string? ITILArea = null,
+    string? Priority = null,
+    int? OwnerId = null,
     ICollection<string>? Tags = null
 );
 
@@ -148,4 +154,29 @@ public record ProsessStatisticsDto(
     int TotalViews,
     ProsessListDto? MostViewedProsess,
     ProsessListDto? RecentlyUpdatedProsess
+);
+
+// ITIL-specific DTOs for Epic 4
+public record ITILAreaDto(
+    string Name,
+    string Description,
+    ICollection<string> CommonProcesses
+);
+
+public record ITILProcessTemplateDto(
+    string Name,
+    string ITILArea,
+    string Purpose,
+    string Description,
+    ICollection<string> KeyActivities,
+    ICollection<string> Inputs,
+    ICollection<string> Outputs,
+    ICollection<string> KPIs,
+    ICollection<CreateProsessStepRequest> DefaultSteps
+);
+
+public record ProsessCategoriesDto(
+    ICollection<string> BusinessCategories,
+    ICollection<ITILAreaDto> ITILAreas,
+    ICollection<string> Priorities
 );

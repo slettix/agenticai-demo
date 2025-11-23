@@ -78,12 +78,21 @@ class ProsessService {
     return this.makeRequest<ProsessStatistics>('/prosess/statistics');
   }
 
-  async getCategories(): Promise<string[]> {
-    return this.makeRequest<string[]>('/prosess/categories');
+  async getCategories(): Promise<any> {
+    return this.makeRequest<any>('/prosess/categories');
   }
 
   async getTags(): Promise<ProsessTag[]> {
     return this.makeRequest<ProsessTag[]>('/prosess/tags');
+  }
+
+  async getITILAreas(): Promise<any[]> {
+    return this.makeRequest<any[]>('/prosess/itil/areas');
+  }
+
+  async getITILTemplates(area?: string): Promise<any[]> {
+    const params = area ? `?area=${encodeURIComponent(area)}` : '';
+    return this.makeRequest<any[]>(`/prosess/itil/templates${params}`);
   }
 }
 
