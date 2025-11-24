@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { prosessService } from '../../services/prosessService.ts';
+import { agentService } from '../../services/agentService.ts';
+import type { ProcessGenerationRequest, AgentJobStatus, ProcessGenerationResult } from '../../types/agent.ts';
 import { ProcessStepBuilder, ProcessStep } from './ProcessStepBuilder.tsx';
 import { AIProcessSuggestions } from './AIProcessSuggestions.tsx';
 import { ProcessTemplateManager } from './ProcessTemplateManager.tsx';
@@ -48,6 +50,10 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
   const [stepBuilderMode, setStepBuilderMode] = useState<'manual' | 'ai' | 'template'>('manual');
   const [showAISuggestions, setShowAISuggestions] = useState(false);
   const [generatingAISteps, setGeneratingAISteps] = useState(false);
+  const [aiJobId, setAiJobId] = useState<string | null>(null);
+  const [aiJobStatus, setAiJobStatus] = useState<AgentJobStatus | null>(null);
+  const [aiGenerationResult, setAiGenerationResult] = useState<ProcessGenerationResult | null>(null);
+  const [aiProgress, setAiProgress] = useState(0);
   const [showTemplateManager, setShowTemplateManager] = useState(false);
   const [selectedProcessTemplate, setSelectedProcessTemplate] = useState<any>(null);
   
@@ -175,19 +181,79 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
   };
 
   const handleGenerateAISteps = async () => {
+    if (!formData.title.trim() || !formData.description.trim()) {
+      setError('Tittel og beskrivelse må være fylt ut for AI-generering');
+      return;
+    }
+
     setGeneratingAISteps(true);
     setStepBuilderMode('ai');
+    setError(null);
+    setAiProgress(0);
     
     try {
-      // Simulate AI generation process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create AI generation request
+      const request: ProcessGenerationRequest = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        category: formData.category || 'ITSM',
+        requirements: formData.itilArea ? [`ITIL ${formData.itilArea} compliance`] : [],
+        targetAudience: 'IT Service Management teams',
+        complexityLevel: 'medium'
+      };
+
+      console.log('Sending AI generation request:', request);
       
-      // In a real implementation, this would call the backend to generate steps
-      // For now, we'll just show the AI mode
-      alert('AI-generering av prosesstrinn vil bli implementert i backend-integrasjonen.');
+      // Submit AI generation job
+      const jobResponse = await agentService.generateProcess(request);
+      setAiJobId(jobResponse.jobId);
+      setAiProgress(10);
+
+      console.log('AI job started:', jobResponse);
+      
+      // Poll for job completion
+      const finalStatus = await agentService.pollJobStatus(
+        jobResponse.jobId,
+        (status) => {
+          setAiJobStatus(status);
+          setAiProgress(status.progress || 0);
+          console.log('AI job progress:', status);
+        }
+      );
+
+      if (finalStatus.status === 'completed') {
+        // Get the generation result
+        const result = await agentService.getGenerationResult(jobResponse.jobId);
+        setAiGenerationResult(result);
+        
+        // Convert AI steps to our ProcessStep format
+        const convertedSteps = result.steps.map(step => ({
+          id: `ai_${Date.now()}_${step.orderIndex}`,
+          title: step.title,
+          description: step.description,
+          type: step.type as any, // Convert to our step type
+          responsibleRole: step.responsibleRole || 'Assignee',
+          estimatedDuration: step.estimatedDuration || 30,
+          orderIndex: step.orderIndex,
+          isOptional: step.isOptional || false,
+          detailedInstructions: step.detailedInstructions || '',
+          itilGuidance: 'AI-generated step based on ITIL best practices'
+        }));
+
+        setProcessSteps(convertedSteps);
+        setAiProgress(100);
+        
+        console.log('AI generation completed:', result);
+        alert(`✅ AI har generert ${result.steps.length} prosesstrinn!\n\nDu kan nå redigere trinnene eller opprette prosessen.`);
+        
+      } else if (finalStatus.status === 'failed') {
+        throw new Error(finalStatus.errorMessage || 'AI-generering feilet');
+      }
       
     } catch (error) {
-      setError('Kunne ikke generere AI-trinn. Prøv igjen senere.');
+      console.error('AI generation error:', error);
+      setError(`AI-generering feilet: ${error instanceof Error ? error.message : 'Ukjent feil'}`);
+      setStepBuilderMode('manual'); // Fall back to manual mode
     } finally {
       setGeneratingAISteps(false);
     }
@@ -430,16 +496,91 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
 
           {stepBuilderMode === 'ai' && (
             <div className="ai-generation-info">
-              <p>🤖 <strong>AI-generering:</strong> Prosesstrinn vil bli generert automatisk basert på prosessinformasjonen når du oppretter prosessen.</p>
-              <div className="ai-preview">
-                <h4>AI vil generere trinn basert på:</h4>
-                <ul>
-                  <li>Prosesstittel: <strong>{formData.title || 'Ikke spesifisert'}</strong></li>
-                  <li>Kategori: <strong>{formData.category || 'Ikke spesifisert'}</strong></li>
-                  {formData.itilArea && <li>ITIL-område: <strong>{formData.itilArea}</strong></li>}
-                  {selectedTemplate && <li>Mal: <strong>{selectedTemplate.name}</strong></li>}
-                </ul>
-              </div>
+              {!generatingAISteps && processSteps.length === 0 && (
+                <>
+                  <p>🤖 <strong>AI-generering:</strong> Klikk "Generer AI-trinn" for å la AI lage prosesstrinn automatisk basert på din beskrivelse.</p>
+                  <div className="ai-preview">
+                    <h4>AI vil generere trinn basert på:</h4>
+                    <ul>
+                      <li>Prosesstittel: <strong>{formData.title || 'Ikke spesifisert'}</strong></li>
+                      <li>Beskrivelse: <strong>{formData.description ? formData.description.substring(0, 50) + '...' : 'Ikke spesifisert'}</strong></li>
+                      <li>Kategori: <strong>{formData.category || 'Ikke spesifisert'}</strong></li>
+                      {formData.itilArea && <li>ITIL-område: <strong>{formData.itilArea}</strong></li>}
+                      <li>Estimert antall trinn: <strong>5-12 trinn</strong></li>
+                    </ul>
+                  </div>
+                  <div className="ai-actions">
+                    <button 
+                      type="button"
+                      onClick={handleGenerateAISteps}
+                      disabled={!formData.title.trim() || !formData.description.trim() || generatingAISteps}
+                      className="btn-generate-ai"
+                    >
+                      {generatingAISteps ? 'Genererer...' : '🚀 Generer AI-trinn'}
+                    </button>
+                    {(!formData.title.trim() || !formData.description.trim()) && (
+                      <p className="requirement-note">* Prosesstittel og beskrivelse må være fylt ut</p>
+                    )}
+                  </div>
+                </>
+              )}
+              
+              {generatingAISteps && (
+                <div className="ai-progress">
+                  <h4>🤖 AI genererer prosesstrinn...</h4>
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: `${aiProgress}%` }}></div>
+                  </div>
+                  <p>{aiJobStatus?.message || 'Behandler prosessinformasjon...'}</p>
+                  <div className="progress-details">
+                    {aiJobStatus && (
+                      <>
+                        <span>Status: {aiJobStatus.status}</span>
+                        <span>Fremgang: {aiProgress}%</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {processSteps.length > 0 && !generatingAISteps && (
+                <div className="ai-result">
+                  <h4>✅ AI har generert {processSteps.length} prosesstrinn</h4>
+                  <p>Du kan redigere trinnene nedenfor eller opprette prosessen direkte.</p>
+                  <div className="ai-steps-preview">
+                    {processSteps.map((step, index) => (
+                      <div key={step.id} className="ai-step-card">
+                        <div className="step-header">
+                          <span className="step-number">{index + 1}</span>
+                          <h5>{step.title}</h5>
+                          <span className="step-type">{step.type}</span>
+                        </div>
+                        <p>{step.description}</p>
+                        <div className="step-meta">
+                          <span>👤 {step.responsibleRole}</span>
+                          <span>⏱️ {step.estimatedDuration} min</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="ai-result-actions">
+                    <button 
+                      type="button"
+                      onClick={() => setStepBuilderMode('manual')}
+                      className="btn-edit-steps"
+                    >
+                      ✏️ Rediger trinn
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={handleGenerateAISteps}
+                      className="btn-regenerate"
+                    >
+                      🔄 Generer på nytt
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
