@@ -7,6 +7,10 @@ import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional
 from enum import Enum
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 
 class JobStatus(str, Enum):

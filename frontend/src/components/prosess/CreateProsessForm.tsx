@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { prosessService } from '../../services/prosessService.ts';
 import { agentService } from '../../services/agentService.ts';
 import type { ProcessGenerationRequest, AgentJobStatus, ProcessGenerationResult } from '../../types/agent.ts';
+import type { CreateProsessStepRequest } from '../../types/prosess.ts';
+import { StepType } from '../../types/prosess.ts';
 import { ProcessStepBuilder, ProcessStep } from './ProcessStepBuilder.tsx';
 import { AIProcessSuggestions } from './AIProcessSuggestions.tsx';
 import { ProcessTemplateManager } from './ProcessTemplateManager.tsx';
@@ -35,6 +37,23 @@ interface ProsessCategories {
   itilAreas: ITILArea[];
   priorities: string[];
 }
+
+// Helper function to convert numeric step type to StepType enum
+const convertStepType = (numericType: number): StepType => {
+  switch (numericType) {
+    case 0: return StepType.Start;
+    case 1: return StepType.Task;
+    case 2: return StepType.Decision;
+    case 3: return StepType.Document;
+    case 4: return StepType.Approval;
+    case 5: return StepType.Gateway;
+    case 6: return StepType.Review;
+    case 7: return StepType.Wait;
+    case 8: return StepType.End;
+    case 9: return StepType.Subprocess;
+    default: return StepType.Task; // Default fallback
+  }
+};
 
 export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -129,23 +148,50 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
         throw new Error('Tittel, beskrivelse og kategori er påkrevd');
       }
 
+      // Convert ProcessStep[] to CreateProsessStepRequest[]
+      const convertedSteps: CreateProsessStepRequest[] | undefined = processSteps.length > 0 ? processSteps.map(step => {
+        console.log('Converting step:', step);
+        const stepType = typeof step.type === 'number' ? convertStepType(step.type) : step.type;
+        console.log(`Step type conversion: ${step.type} -> ${stepType}`);
+        return {
+          title: step.title,
+          description: step.description,
+          type: stepType,
+          responsibleRole: step.responsibleRole || undefined,
+          estimatedDurationMinutes: step.estimatedDuration || undefined,
+          orderIndex: step.orderIndex || 0,
+          isOptional: step.isOptional || false,
+          detailedInstructions: step.detailedInstructions || undefined,
+          iTILGuidance: step.itilGuidance || undefined
+        };
+      }) : undefined;
+
+      // Match the exact CreateProsessRequest DTO structure
       const requestData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         category: formData.category,
         itilArea: formData.itilArea || undefined,
         priority: formData.priority,
-        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : undefined,
-        processSteps: stepBuilderMode === 'manual' ? processSteps : undefined,
-        stepBuilderMode
+        tags: formData.tags && formData.tags.trim() ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : undefined,
+        processSteps: convertedSteps
       };
 
+      console.log('Sending request to backend:', requestData);
+      console.log('Process steps being sent:', convertedSteps);
+
+      console.log('Calling prosessService.createProsess...');
       const newProsess = await prosessService.createProsess(requestData);
+      console.log('Response from backend:', newProsess);
       
-      if (newProsess) {
+      if (newProsess && newProsess.id) {
+        console.log('Process created successfully, calling onSuccess with ID:', newProsess.id);
         onSuccess(newProsess.id);
+      } else {
+        throw new Error('Prosess ble opprettet, men ID mangler i responsen');
       }
     } catch (err) {
+      console.error('Error in handleSubmit:', err);
       setError(err instanceof Error ? err.message : 'En feil oppstod under opprettelse av prosess');
     } finally {
       setIsLoading(false);
@@ -227,24 +273,27 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
         setAiGenerationResult(result);
         
         // Convert AI steps to our ProcessStep format
-        const convertedSteps = result.steps.map(step => ({
-          id: `ai_${Date.now()}_${step.orderIndex}`,
-          title: step.title,
-          description: step.description,
-          type: step.type as any, // Convert to our step type
-          responsibleRole: step.responsibleRole || 'Assignee',
-          estimatedDuration: step.estimatedDuration || 30,
-          orderIndex: step.orderIndex,
-          isOptional: step.isOptional || false,
-          detailedInstructions: step.detailedInstructions || '',
-          itilGuidance: 'AI-generated step based on ITIL best practices'
-        }));
+        const convertedSteps = (result.steps || []).map((step, index) => {
+          console.log(`Processing AI step ${index + 1}:`, step);
+          return {
+            id: `ai_${Date.now()}_${index}`,
+            title: step.title || `Step ${index + 1}`,
+            description: step.description || '',
+            type: typeof step.type === 'number' ? step.type : parseInt(step.type) || 1, // Ensure numeric type
+            responsibleRole: step.responsible_role || step.responsibleRole || 'Assignee',
+            estimatedDuration: parseInt(step.estimated_duration || step.estimatedDuration || 30),
+            orderIndex: parseInt(step.order_index || step.orderIndex || index),
+            isOptional: Boolean(step.is_optional || step.isOptional || false),
+            detailedInstructions: step.detailed_instructions || step.detailedInstructions || '',
+            itilGuidance: 'AI-generated step based on ITIL best practices'
+          };
+        });
 
         setProcessSteps(convertedSteps);
         setAiProgress(100);
         
         console.log('AI generation completed:', result);
-        alert(`✅ AI har generert ${result.steps.length} prosesstrinn!\n\nDu kan nå redigere trinnene eller opprette prosessen.`);
+        alert(`✅ AI har generert ${result.steps?.length || 0} prosesstrinn!\n\nDu kan nå redigere trinnene eller opprette prosessen.`);
         
       } else if (finalStatus.status === 'failed') {
         throw new Error(finalStatus.errorMessage || 'AI-generering feilet');
@@ -417,8 +466,8 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
                 <div className="template-preview">
                   <h4>📋 Forhåndsvisning: {selectedTemplate.name}</h4>
                   <p><strong>Formål:</strong> {selectedTemplate.purpose}</p>
-                  <p><strong>Nøkkelaktiviteter:</strong> {selectedTemplate.keyActivities.join(', ')}</p>
-                  <p><strong>KPI-er:</strong> {selectedTemplate.kpis.join(', ')}</p>
+                  <p><strong>Nøkkelaktiviteter:</strong> {selectedTemplate.keyActivities?.join(', ') || 'Ikke spesifisert'}</p>
+                  <p><strong>KPI-er:</strong> {selectedTemplate.kpis?.join(', ') || 'Ikke spesifisert'}</p>
                   <button
                     type="button"
                     className="btn-secondary small"

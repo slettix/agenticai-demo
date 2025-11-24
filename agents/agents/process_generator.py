@@ -7,7 +7,11 @@ import json
 from typing import Dict, Any, List, Callable, Optional
 from openai import AsyncOpenAI
 from datetime import datetime
+from dotenv import load_dotenv
 from .itil_knowledge_agent import ITILKnowledgeAgent
+
+# Load environment variables
+load_dotenv()
 
 
 class ProcessGeneratorAgent:
