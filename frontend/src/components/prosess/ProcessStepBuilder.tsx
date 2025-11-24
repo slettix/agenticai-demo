@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { StepType } from '../../types/prosess.ts';
 import './ProcessStepBuilder.css';
 
 export interface ProcessStep {
   id: string;
   title: string;
   description: string;
-  type: 'Task' | 'Decision' | 'Document' | 'Approval' | 'Gateway';
+  type: StepType;
   responsibleRole: string;
   estimatedDuration: number;
   orderIndex: number;
@@ -24,11 +25,11 @@ interface ProcessStepBuilderProps {
 }
 
 const stepTypes = [
-  { value: 'Task', label: 'Oppgave', icon: '📝', description: 'En handling som må utføres' },
-  { value: 'Decision', label: 'Beslutning', icon: '🤔', description: 'Et beslutningspunkt med alternativer' },
-  { value: 'Document', label: 'Dokumentasjon', icon: '📄', description: 'Dokumentering eller registrering' },
-  { value: 'Approval', label: 'Godkjenning', icon: '✅', description: 'Formell godkjenning eller autorisering' },
-  { value: 'Gateway', label: 'Gateway', icon: '🚦', description: 'Kontrollpunkt eller validering' }
+  { value: StepType.Task, label: 'Oppgave', icon: '📝', description: 'En handling som må utføres' },
+  { value: StepType.Decision, label: 'Beslutning', icon: '🤔', description: 'Et beslutningspunkt med alternativer' },
+  { value: StepType.Document, label: 'Dokumentasjon', icon: '📄', description: 'Dokumentering eller registrering' },
+  { value: StepType.Approval, label: 'Godkjenning', icon: '✅', description: 'Formell godkjenning eller autorisering' },
+  { value: StepType.Gateway, label: 'Gateway', icon: '🚦', description: 'Kontrollpunkt eller validering' }
 ];
 
 const commonRoles = [
@@ -56,7 +57,7 @@ export const ProcessStepBuilder: React.FC<ProcessStepBuilderProps> = ({
   const [newStep, setNewStep] = useState<Partial<ProcessStep>>({
     title: '',
     description: '',
-    type: 'Task',
+    type: StepType.Task,
     responsibleRole: '',
     estimatedDuration: 30,
     isOptional: false,
@@ -78,7 +79,7 @@ export const ProcessStepBuilder: React.FC<ProcessStepBuilderProps> = ({
       id: generateStepId(),
       title: newStep.title!,
       description: newStep.description!,
-      type: newStep.type as ProcessStep['type'],
+      type: newStep.type as StepType,
       responsibleRole: newStep.responsibleRole!,
       estimatedDuration: newStep.estimatedDuration || 30,
       orderIndex: steps.length + 1,
@@ -94,7 +95,7 @@ export const ProcessStepBuilder: React.FC<ProcessStepBuilderProps> = ({
     setNewStep({
       title: '',
       description: '',
-      type: 'Task',
+      type: StepType.Task,
       responsibleRole: '',
       estimatedDuration: 30,
       isOptional: false,

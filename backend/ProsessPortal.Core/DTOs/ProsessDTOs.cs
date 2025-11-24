@@ -96,7 +96,20 @@ public record CreateProsessRequest(
     string? ITILArea = null,
     string? Priority = null,
     int? OwnerId = null,
-    ICollection<string>? Tags = null
+    ICollection<string>? Tags = null,
+    ICollection<CreateProsessStepRequest>? ProcessSteps = null
+);
+
+public record CreateProsessStepRequest(
+    string Title,
+    string Description,
+    StepType Type,
+    string? ResponsibleRole = null,
+    int? EstimatedDurationMinutes = null,
+    int OrderIndex = 0,
+    bool IsOptional = false,
+    string? DetailedInstructions = null,
+    string? ITILGuidance = null
 );
 
 public record UpdateProsessRequest(
@@ -109,17 +122,6 @@ public record UpdateProsessRequest(
     ICollection<string>? Tags = null
 );
 
-public record CreateProsessStepRequest(
-    string Title,
-    string Description,
-    string? DetailedInstructions,
-    int OrderIndex,
-    StepType Type,
-    string? ResponsibleRole,
-    int? EstimatedDurationMinutes,
-    bool IsOptional,
-    int? ParentStepId
-);
 
 public record ProsessSearchRequest(
     string? Search = null,

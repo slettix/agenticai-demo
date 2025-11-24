@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProsessPortal.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+df700cfe0fab7c8d4ba7489c07bbdbabc70b1593")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d3a47abfcb67f3e424444f0d931d64b94687287")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProsessPortal.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProsessPortal.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

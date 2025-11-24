@@ -476,35 +476,35 @@ namespace ProsessPortal.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 11, 23, 21, 36, 55, 275, DateTimeKind.Utc).AddTicks(3980),
+                            CreatedAt = new DateTime(2025, 11, 24, 5, 57, 40, 500, DateTimeKind.Utc).AddTicks(5930),
                             Description = "Systemadministrator med full tilgang",
                             Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 11, 23, 21, 36, 55, 275, DateTimeKind.Utc).AddTicks(4300),
+                            CreatedAt = new DateTime(2025, 11, 24, 5, 57, 40, 500, DateTimeKind.Utc).AddTicks(6250),
                             Description = "Eier av prosesser, kan redigere og godkjenne",
                             Name = "ProsessEier"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 11, 23, 21, 36, 55, 275, DateTimeKind.Utc).AddTicks(4300),
+                            CreatedAt = new DateTime(2025, 11, 24, 5, 57, 40, 500, DateTimeKind.Utc).AddTicks(6250),
                             Description = "Kvalitetssikring, kan godkjenne endringer",
                             Name = "QA"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 11, 23, 21, 36, 55, 275, DateTimeKind.Utc).AddTicks(4300),
+                            CreatedAt = new DateTime(2025, 11, 24, 5, 57, 40, 500, DateTimeKind.Utc).AddTicks(6250),
                             Description = "Fagekspert, kan foreslå endringer",
                             Name = "SME"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 11, 23, 21, 36, 55, 275, DateTimeKind.Utc).AddTicks(4300),
+                            CreatedAt = new DateTime(2025, 11, 24, 5, 57, 40, 500, DateTimeKind.Utc).AddTicks(6250),
                             Description = "Vanlig bruker, kun lesetilgang",
                             Name = "Bruker"
                         });

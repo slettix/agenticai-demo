@@ -170,6 +170,29 @@ public class ProsessService : IProsessService
         _context.Prosesser.Add(prosess);
         await _context.SaveChangesAsync();
 
+        // Add process steps if provided
+        if (request.ProcessSteps?.Any() == true)
+        {
+            foreach (var stepRequest in request.ProcessSteps)
+            {
+                var step = new ProsessStep
+                {
+                    ProsessId = prosess.Id,
+                    Title = stepRequest.Title,
+                    Description = stepRequest.Description,
+                    Type = stepRequest.Type,
+                    ResponsibleRole = stepRequest.ResponsibleRole,
+                    EstimatedDurationMinutes = stepRequest.EstimatedDurationMinutes,
+                    OrderIndex = stepRequest.OrderIndex,
+                    IsOptional = stepRequest.IsOptional,
+                    DetailedInstructions = stepRequest.DetailedInstructions,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.ProsessSteps.Add(step);
+            }
+            await _context.SaveChangesAsync();
+        }
+
         // Add tags if provided
         if (request.Tags?.Any() == true)
         {
@@ -380,11 +403,11 @@ public class ProsessService : IProsessService
                 new[] { "Mean Time to Resolve (MTTR)", "First Call Resolution Rate", "Customer Satisfaction Score", "Incident Volume" },
                 new List<CreateProsessStepRequest>
                 {
-                    new("Hendelse identifisert og registrert", "Identifiser og registrer hendelsen i ITSM-verktøy", "Fyll ut alle obligatoriske felt i hendelsesregistrering", 1, StepType.Task, "Service Desk", 5, false, null),
-                    new("Kategorisering og prioritering", "Kategoriser hendelsen og sett prioritet basert på påvirkning og hastighet", "Bruk kategoriseringsmatrise for å bestemme riktig prioritet", 2, StepType.Decision, "Service Desk", 10, false, null),
-                    new("Første nivå støtte", "Forsøk å løse hendelsen på første nivå", "Følg kjente prosedyrer og søk i kunnskapsdatabase", 3, StepType.Task, "Service Desk", 15, false, null),
-                    new("Eskalering hvis nødvendig", "Eskaler til andre nivå hvis hendelsen ikke kan løses", "Eskalering basert på prioritet og kompleksitet", 4, StepType.Decision, "Service Desk", 5, true, null),
-                    new("Hendelse løst og lukket", "Bekreft løsning med bruker og lukk hendelsen", "Få bekreftelse fra bruker før lukking", 5, StepType.Task, "Service Desk", 10, false, null)
+                    new("Hendelse identifisert og registrert", "Identifiser og registrer hendelsen i ITSM-verktøy", StepType.Task, "Service Desk", 5, 1, false, "Fyll ut alle obligatoriske felt i hendelsesregistrering"),
+                    new("Kategorisering og prioritering", "Kategoriser hendelsen og sett prioritet basert på påvirkning og hastighet", StepType.Decision, "Service Desk", 10, 2, false, "Bruk kategoriseringsmatrise for å bestemme riktig prioritet"),
+                    new("Første nivå støtte", "Forsøk å løse hendelsen på første nivå", StepType.Task, "Service Desk", 15, 3, false, "Følg kjente prosedyrer og søk i kunnskapsdatabase"),
+                    new("Eskalering hvis nødvendig", "Eskaler til andre nivå hvis hendelsen ikke kan løses", StepType.Decision, "Service Desk", 5, 4, true, "Eskalering basert på prioritet og kompleksitet"),
+                    new("Hendelse løst og lukket", "Bekreft løsning med bruker og lukk hendelsen", StepType.Task, "Service Desk", 10, 5, false, "Få bekreftelse fra bruker før lukking")
                 }),
 
             new("Change Management",
@@ -397,12 +420,12 @@ public class ProsessService : IProsessService
                 new[] { "Change Success Rate", "Emergency Changes Percentage", "Changes Causing Incidents", "Average Change Lead Time" },
                 new List<CreateProsessStepRequest>
                 {
-                    new("RFC opprettelse", "Opprett Request for Change (RFC)", "Fyll ut alle nødvendige detaljer i RFC-skjema", 1, StepType.Document, "Change Requester", 30, false, null),
-                    new("Endringsvurdering", "Vurder risiko, påvirkning og ressursbehov", "Utfør impact assessment og risk analysis", 2, StepType.Task, "Change Manager", 60, false, null),
-                    new("CAB gjennomgang", "Change Advisory Board gjennomgang og godkjenning", "Presenter endringen for CAB og få godkjenning", 3, StepType.Approval, "Change Advisory Board", 120, false, null),
-                    new("Implementeringsplanlegging", "Planlegg implementering og tilbakerulle-plan", "Detaljert plan for implementering og tilbakerulle", 4, StepType.Task, "Change Manager", 90, false, null),
-                    new("Implementering", "Gjennomfør endringen i henhold til plan", "Følg implementeringsplan nøye og dokumenter prosess", 5, StepType.Task, "Implementation Team", 180, false, null),
-                    new("Post-implementation review", "Evaluér endringen og dokumenter resultater", "Vurder om endringen var vellykket og lærdom", 6, StepType.Task, "Change Manager", 45, false, null)
+                    new("RFC opprettelse", "Opprett Request for Change (RFC)", StepType.Document, "Change Requester", 30, 1, false, "Fyll ut alle nødvendige detaljer i RFC-skjema"),
+                    new("Endringsvurdering", "Vurder risiko, påvirkning og ressursbehov", StepType.Task, "Change Manager", 60, 2, false, "Utfør impact assessment og risk analysis"),
+                    new("CAB gjennomgang", "Change Advisory Board gjennomgang og godkjenning", StepType.Approval, "Change Advisory Board", 120, 3, false, "Presenter endringen for CAB og få godkjenning"),
+                    new("Implementeringsplanlegging", "Planlegg implementering og tilbakerulle-plan", StepType.Task, "Change Manager", 90, 4, false, "Detaljert plan for implementering og tilbakerulle"),
+                    new("Implementering", "Gjennomfør endringen i henhold til plan", StepType.Task, "Implementation Team", 180, 5, false, "Følg implementeringsplan nøye og dokumenter prosess"),
+                    new("Post-implementation review", "Evaluér endringen og dokumenter resultater", StepType.Task, "Change Manager", 45, 6, false, "Vurder om endringen var vellykket og lærdom")
                 }),
 
             new("Problem Management", 
@@ -415,11 +438,11 @@ public class ProsessService : IProsessService
                 new[] { "Problem Resolution Time", "Problem Prevention Rate", "Known Error Success Rate" },
                 new List<CreateProsessStepRequest>
                 {
-                    new("Problemidentifikasjon", "Identifiser og registrer problemet", "Analyser hendelsesmønstre for å identifisere underliggende problemer", 1, StepType.Task, "Problem Manager", 30, false, null),
-                    new("Problemkategorisering", "Kategoriser og prioriter problemet", "Klassifiser problem basert på påvirkning og hastighet", 2, StepType.Decision, "Problem Manager", 15, false, null),
-                    new("Undersøkelse og diagnose", "Utfør detaljert undersøkelse av problemet", "Bruk problemløsningsmetoder for å finne rotårsak", 3, StepType.Task, "Technical Team", 240, false, null),
-                    new("Workaround dokumentering", "Dokumenter midlertidige løsninger", "Opprett kjent feil-oppføring med workaround", 4, StepType.Document, "Problem Manager", 45, true, null),
-                    new("Problemløsning", "Implementer permanent løsning", "Utarbeid RFC for permanent løsning", 5, StepType.Task, "Technical Team", 360, false, null)
+                    new("Problemidentifikasjon", "Identifiser og registrer problemet", StepType.Task, "Problem Manager", 30, 1, false, "Analyser hendelsesmønstre for å identifisere underliggende problemer"),
+                    new("Problemkategorisering", "Kategoriser og prioriter problemet", StepType.Decision, "Problem Manager", 15, 2, false, "Klassifiser problem basert på påvirkning og hastighet"),
+                    new("Undersøkelse og diagnose", "Utfør detaljert undersøkelse av problemet", StepType.Task, "Technical Team", 240, 3, false, "Bruk problemløsningsmetoder for å finne rotårsak"),
+                    new("Workaround dokumentering", "Dokumenter midlertidige løsninger", StepType.Document, "Problem Manager", 45, 4, true, "Opprett kjent feil-oppføring med workaround"),
+                    new("Problemløsning", "Implementer permanent løsning", StepType.Task, "Technical Team", 360, 5, false, "Utarbeid RFC for permanent løsning")
                 })
         };
 

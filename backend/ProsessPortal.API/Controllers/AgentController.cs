@@ -179,7 +179,7 @@ public class AgentController : ControllerBase
                 Title: generationResult.Title,
                 Description: generationResult.Description,
                 Category: generationResult.Category,
-                Tags: generationResult.Tags?.ToArray()
+                Tags: generationResult.Tags?.ToArray() ?? null
             );
 
             // Create the process

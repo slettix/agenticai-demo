@@ -56,16 +56,9 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ProsessPortalDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        // Use in-memory database for development
-        options.UseInMemoryDatabase("ProsessPortalDb");
-    }
-    else
-    {
-        // Use PostgreSQL for production/development with connection string
-        options.UseNpgsql(connectionString);
-    }
+    
+    // Always use PostgreSQL
+    options.UseNpgsql(connectionString);
 });
 
 // JWT Authentication
@@ -136,15 +129,15 @@ using (var scope = app.Services.CreateScope())
     
     try 
     {
-        // Create tables if they don't exist and seed default data
+        // Create database schema - use EnsureCreated for now
         bool created = context.Database.EnsureCreated();
         if (created)
         {
-            Log.Information("Database schema created and seeded successfully");
+            Log.Information("Database schema created successfully");
         }
         else
         {
-            Log.Information("Database already exists - checking admin user");
+            Log.Information("Database schema already exists");
         }
 
         // Ensure admin user exists with correct password hash

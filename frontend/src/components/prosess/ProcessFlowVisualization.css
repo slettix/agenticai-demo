@@ -1,0 +1,405 @@
+/* Process Flow Visualization Styles */
+
+.process-flow-visualization {
+  background: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.process-flow-empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-state {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  color: #657786;
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.empty-state p {
+  color: #8899a6;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Header */
+.process-flow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f7f9fa;
+}
+
+.process-info h3 {
+  margin: 0 0 8px 0;
+  color: #14171a;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.process-description {
+  margin: 0;
+  color: #657786;
+  font-size: 14px;
+  max-width: 500px;
+  line-height: 1.4;
+}
+
+.process-metrics {
+  display: flex;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #8899a6;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 18px;
+  color: #14171a;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Timeline */
+.process-flow-timeline {
+  margin: 0 0 24px 0;
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Step Cards */
+.step-card {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 16px;
+  flex: 1;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 80px;
+}
+
+.step-card.clickable {
+  cursor: pointer;
+}
+
+.step-card.clickable:hover {
+  border-color: #1da1f2;
+  box-shadow: 0 4px 12px rgba(29, 161, 242, 0.15);
+  transform: translateY(-1px);
+}
+
+.step-card.selected {
+  border-color: #1da1f2;
+  background: #f7fbff;
+  box-shadow: 0 4px 12px rgba(29, 161, 242, 0.2);
+}
+
+.step-card.optional {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+/* Step Type Styles */
+.step-start {
+  border-color: #28a745;
+  background: linear-gradient(135deg, #f8fff9 0%, #ffffff 100%);
+}
+
+.step-task {
+  border-color: #1da1f2;
+  background: linear-gradient(135deg, #f7fbff 0%, #ffffff 100%);
+}
+
+.step-document {
+  border-color: #6c757d;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.step-gateway {
+  border-color: #20c997;
+  background: linear-gradient(135deg, #f0fff8 0%, #ffffff 100%);
+}
+
+.step-decision {
+  border-color: #ffc107;
+  background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
+}
+
+.step-approval {
+  border-color: #28a745;
+  background: linear-gradient(135deg, #f8fff9 0%, #ffffff 100%);
+}
+
+.step-review {
+  border-color: #6f42c1;
+  background: linear-gradient(135deg, #fbf8ff 0%, #ffffff 100%);
+}
+
+.step-wait {
+  border-color: #fd7e14;
+  background: linear-gradient(135deg, #fff8f0 0%, #ffffff 100%);
+}
+
+.step-end {
+  border-color: #dc3545;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+}
+
+.step-subprocess {
+  border-color: #17a2b8;
+  background: linear-gradient(135deg, #f0fbff 0%, #ffffff 100%);
+}
+
+/* Step Components */
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #1da1f2;
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.step-icon {
+  font-size: 24px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-title {
+  margin: 0 0 4px 0;
+  color: #14171a;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.step-description {
+  margin: 0 0 8px 0;
+  color: #657786;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.step-metadata {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.responsible-role,
+.estimated-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #f7f9fa;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #657786;
+  font-weight: 500;
+}
+
+.optional-badge {
+  padding: 2px 8px;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Connectors */
+.step-connector {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  padding-left: 60px; /* Align with step content */
+}
+
+.connector-line {
+  width: 2px;
+  height: 20px;
+  background: #e1e8ed;
+  margin-right: 8px;
+}
+
+.connector-arrow {
+  color: #8899a6;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Footer */
+.process-flow-footer {
+  border-top: 1px solid #f7f9fa;
+  padding-top: 16px;
+}
+
+.process-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #657786;
+}
+
+.stat-icon {
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .process-flow-visualization {
+    padding: 16px;
+  }
+
+  .process-flow-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .process-metrics {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .metric {
+    align-items: flex-start;
+  }
+
+  .step-card {
+    padding: 12px;
+    min-height: auto;
+  }
+
+  .step-metadata {
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .process-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Dark Mode Support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .process-flow-visualization {
+    background: #192734;
+    border-color: #38444d;
+    color: #ffffff;
+  }
+
+  .process-flow-header {
+    border-bottom-color: #38444d;
+  }
+
+  .process-info h3 {
+    color: #ffffff;
+  }
+
+  .process-description {
+    color: #8899a6;
+  }
+
+  .step-card {
+    background: #192734;
+    border-color: #38444d;
+    color: #ffffff;
+  }
+
+  .step-card:hover {
+    border-color: #1da1f2;
+    background: #1a2332;
+  }
+
+  .step-card.selected {
+    background: #1a2332;
+  }
+
+  .step-title {
+    color: #ffffff;
+  }
+
+  .responsible-role,
+  .estimated-duration {
+    background: #38444d;
+    color: #8899a6;
+  }
+
+  .connector-line {
+    background: #38444d;
+  }
+
+  .process-flow-footer {
+    border-top-color: #38444d;
+  }
+}

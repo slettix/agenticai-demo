@@ -4,7 +4,7 @@ import { LoginForm } from './components/auth/LoginForm.tsx';
 import { RegisterForm } from './components/auth/RegisterForm.tsx';
 import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
 import { ProsessListe } from './components/prosess/ProsessListe.tsx';
-import { ProsessDetaljer } from './components/prosess/ProsessDetaljer.tsx';
+import { ProsessDetailWrapper } from './components/prosess/ProsessDetailWrapper.tsx';
 import { CreateProsessForm } from './components/prosess/CreateProsessForm.tsx';
 import TestComponent from './TestComponent.tsx';
 import './components/auth/auth.css';
@@ -98,7 +98,7 @@ const AppContent: React.FC = () => {
         )}
         
         {currentView === 'prosess-detail' && selectedProsessId && (
-          <ProsessDetaljer 
+          <ProsessDetailWrapper 
             prosessId={selectedProsessId}
             onBack={() => setCurrentView('prosesser')}
           />

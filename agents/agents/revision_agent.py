@@ -6,6 +6,10 @@ import json
 from typing import Dict, Any, List, Callable, Optional
 from openai import AsyncOpenAI
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 
 class RevisionAgent:

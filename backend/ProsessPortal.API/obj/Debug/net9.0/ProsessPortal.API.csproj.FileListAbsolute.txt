@@ -176,3 +176,4 @@
 /Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.API/obj/Debug/net9.0/ProsessPortal.API.pdb
 /Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.API/obj/Debug/net9.0/ProsessPortal.API.genruntimeconfig.cache
 /Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.API/obj/Debug/net9.0/ref/ProsessPortal.API.dll
+/Users/e.sletteng-fagerli/projects/agenticai-demo/backend/ProsessPortal.API/bin/Debug/net9.0/appsettings.json

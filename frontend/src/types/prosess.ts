@@ -9,13 +9,15 @@ export enum ProsessStatus {
 
 export enum StepType {
   Start = 0,
-  Action = 1,
+  Task = 1,
   Decision = 2,
-  Approval = 3,
-  Review = 4,
-  Wait = 5,
-  End = 6,
-  Subprocess = 7
+  Document = 3,
+  Approval = 4,
+  Gateway = 5,
+  Review = 6,
+  Wait = 7,
+  End = 8,
+  Subprocess = 9
 }
 
 export enum ConnectionType {
@@ -121,6 +123,19 @@ export interface CreateProsessRequest {
   priority?: string;
   ownerId?: number;
   tags?: string[];
+  processSteps?: CreateProsessStepRequest[];
+}
+
+export interface CreateProsessStepRequest {
+  title: string;
+  description: string;
+  type: StepType;
+  responsibleRole?: string;
+  estimatedDurationMinutes?: number;
+  orderIndex: number;
+  isOptional?: boolean;
+  detailedInstructions?: string;
+  itilGuidance?: string;
 }
 
 export interface UpdateProsessRequest {
