@@ -4,7 +4,7 @@ namespace ProsessPortal.Core.Interfaces;
 
 public interface IProsessService
 {
-    Task<PagedResult<ProsessListDto>> SearchProsessesAsync(ProsessSearchRequest request);
+    Task<PagedResult<ProsessListDto>> SearchProsessesAsync(ProsessSearchRequest request, int? userId = null);
     Task<ProsessDetailDto?> GetProsessDetailAsync(int id);
     Task<ProsessDetailDto?> CreateProsessAsync(CreateProsessRequest request, int userId);
     Task<ProsessDetailDto?> UpdateProsessAsync(int id, UpdateProsessRequest request, int userId);

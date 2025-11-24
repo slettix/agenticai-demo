@@ -25,7 +25,8 @@ public class ProsessController : ControllerBase
     {
         try
         {
-            var result = await _prosessService.SearchProsessesAsync(request);
+            var userId = GetCurrentUserId();
+            var result = await _prosessService.SearchProsessesAsync(request, userId);
             return Ok(result);
         }
         catch (Exception ex)

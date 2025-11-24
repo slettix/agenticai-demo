@@ -29,9 +29,11 @@ public class Prosess
 public enum ProsessStatus
 {
     Draft = 0,
-    InReview = 1,
-    Approved = 2,
-    Published = 3,
-    Deprecated = 4,
-    Archived = 5
+    PendingApproval = 1,
+    InReview = 2,
+    Approved = 3,
+    Rejected = 4,
+    Published = 5,
+    Deprecated = 6,
+    Archived = 7
 }

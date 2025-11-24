@@ -110,6 +110,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IProsessService, ProsessService>();
+builder.Services.AddScoped<IApprovalService, ApprovalService>();
+builder.Services.AddScoped<IEditingService, EditingService>();
 
 // HTTP client for agent service
 builder.Services.AddHttpClient<IAgentService, AgentService>(client =>

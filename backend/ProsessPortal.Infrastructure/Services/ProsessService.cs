@@ -15,7 +15,7 @@ public class ProsessService : IProsessService
         _context = context;
     }
 
-    public async Task<PagedResult<ProsessListDto>> SearchProsessesAsync(ProsessSearchRequest request)
+    public async Task<PagedResult<ProsessListDto>> SearchProsessesAsync(ProsessSearchRequest request, int? userId = null)
     {
         var query = _context.Prosesser
             .Include(p => p.CreatedByUser)
@@ -23,6 +23,17 @@ public class ProsessService : IProsessService
             .Include(p => p.Tags)
             .Where(p => p.IsActive)
             .AsQueryable();
+
+        // Apply role-based filtering
+        if (userId.HasValue)
+        {
+            var userCanSeeAllStatuses = await CanUserSeeAllStatusesAsync(userId.Value);
+            if (!userCanSeeAllStatuses)
+            {
+                // Regular users can only see Published processes
+                query = query.Where(p => p.Status == ProsessStatus.Published);
+            }
+        }
 
         // Apply filters
         if (!string.IsNullOrWhiteSpace(request.Search))
@@ -100,6 +111,32 @@ public class ProsessService : IProsessService
             .ToListAsync();
 
         return new PagedResult<ProsessListDto>(items, totalCount, request.Page, request.PageSize, totalPages);
+    }
+
+    private async Task<bool> CanUserSeeAllStatusesAsync(int userId)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                    .ThenInclude(r => r.RolePermissions)
+                        .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(u => u.Id == userId && u.IsActive);
+
+        if (user == null) return false;
+
+        // Check if user has permissions that allow seeing all statuses
+        var allowedPermissions = new[] {
+            PermissionNames.EditProsess,
+            PermissionNames.CreateProsess,
+            PermissionNames.ApproveProsess,
+            PermissionNames.ViewQAQueue,
+            PermissionNames.ManageUsers,
+            PermissionNames.ManageRoles
+        };
+
+        return user.UserRoles
+            .SelectMany(ur => ur.Role.RolePermissions)
+            .Any(rp => allowedPermissions.Contains(rp.Permission.Name));
     }
 
     public async Task<ProsessDetailDto?> GetProsessDetailAsync(int id)

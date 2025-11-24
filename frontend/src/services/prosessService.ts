@@ -78,6 +78,12 @@ class ProsessService {
     return this.makeRequest<ProsessStatistics>('/prosess/statistics');
   }
 
+  async recordView(id: number): Promise<void> {
+    // Record view is handled automatically by the backend when getProsess is called
+    // This method exists for compatibility but doesn't need to do anything
+    return Promise.resolve();
+  }
+
   async getCategories(): Promise<any> {
     return this.makeRequest<any>('/prosess/categories');
   }

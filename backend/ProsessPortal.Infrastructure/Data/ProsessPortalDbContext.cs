@@ -22,6 +22,16 @@ public class ProsessPortalDbContext : DbContext
     public DbSet<StepConnection> StepConnections { get; set; }
     public DbSet<ProsessTag> ProsessTags { get; set; }
     
+    // Approval entities
+    public DbSet<ProsessApprovalRequest> ProsessApprovalRequests { get; set; }
+    public DbSet<ProsessApprovalComment> ProsessApprovalComments { get; set; }
+    public DbSet<ProsessApprovalHistory> ProsessApprovalHistory { get; set; }
+    
+    // Editing entities
+    public DbSet<ProsessEditSession> ProsessEditSessions { get; set; }
+    public DbSet<ProsessEditConflict> ProsessEditConflicts { get; set; }
+    public DbSet<ProsessAutoSave> ProsessAutoSaves { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -273,6 +283,163 @@ public class ProsessPortalDbContext : DbContext
                 AssignedAt = new DateTime(2025, 11, 23, 17, 0, 0, DateTimeKind.Utc)
             }
         );
+        
+        // ProsessApprovalRequest configuration
+        modelBuilder.Entity<ProsessApprovalRequest>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.RequestComment).HasMaxLength(1000);
+            entity.Property(e => e.ApprovalComment).HasMaxLength(1000);
+            entity.Property(e => e.RejectionReason).HasMaxLength(1000);
+            
+            entity.HasOne(e => e.Prosess)
+                .WithMany()
+                .HasForeignKey(e => e.ProsessId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.RequestedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.RequestedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasOne(e => e.ApprovedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.ApprovedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.ProsessId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.RequestedAt);
+        });
+        
+        // ProsessApprovalComment configuration
+        modelBuilder.Entity<ProsessApprovalComment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Comment).HasMaxLength(2000).IsRequired();
+            
+            entity.HasOne(e => e.ApprovalRequest)
+                .WithMany(e => e.Comments)
+                .HasForeignKey(e => e.ApprovalRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.ApprovalRequestId);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+        
+        // ProsessApprovalHistory configuration
+        modelBuilder.Entity<ProsessApprovalHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Comment).HasMaxLength(1000);
+            entity.Property(e => e.Action).HasMaxLength(50).IsRequired();
+            
+            entity.HasOne(e => e.Prosess)
+                .WithMany()
+                .HasForeignKey(e => e.ProsessId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.ProsessId);
+            entity.HasIndex(e => e.ChangedAt);
+        });
+        
+        // ProsessEditSession configuration
+        modelBuilder.Entity<ProsessEditSession>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SessionId).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.StartComment).HasMaxLength(1000);
+            entity.Property(e => e.CompletionComment).HasMaxLength(1000);
+            entity.Property(e => e.DraftTitle).HasMaxLength(200);
+            entity.Property(e => e.DraftDescription).HasMaxLength(1000);
+            entity.Property(e => e.DraftCategory).HasMaxLength(50);
+            entity.Property(e => e.DraftTags).HasMaxLength(2000);
+            entity.Property(e => e.DraftSteps).HasMaxLength(10000);
+            
+            entity.HasOne(e => e.Prosess)
+                .WithMany()
+                .HasForeignKey(e => e.ProsessId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasOne(e => e.CreatedVersion)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedVersionId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            entity.HasIndex(e => e.SessionId).IsUnique();
+            entity.HasIndex(e => e.ProsessId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.LastActivity);
+        });
+        
+        // ProsessEditConflict configuration
+        modelBuilder.Entity<ProsessEditConflict>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SessionId1).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.SessionId2).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.ConflictingFields).HasMaxLength(2000);
+            entity.Property(e => e.ResolutionComment).HasMaxLength(1000);
+            
+            entity.HasOne(e => e.Prosess)
+                .WithMany()
+                .HasForeignKey(e => e.ProsessId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.User1)
+                .WithMany()
+                .HasForeignKey(e => e.UserId1)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasOne(e => e.User2)
+                .WithMany()
+                .HasForeignKey(e => e.UserId2)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasOne(e => e.ResolvedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.ResolvedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.ProsessId);
+            entity.HasIndex(e => e.DetectedAt);
+        });
+        
+        // ProsessAutoSave configuration
+        modelBuilder.Entity<ProsessAutoSave>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SessionId).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Content).HasMaxLength(20000);
+            
+            entity.HasOne(e => e.Prosess)
+                .WithMany()
+                .HasForeignKey(e => e.ProsessId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.SessionId);
+            entity.HasIndex(e => e.SavedAt);
+        });
         
         // Seed sample processes
         SeedSampleProsesses(modelBuilder);

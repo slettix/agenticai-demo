@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ProsessListItem, ProsessSearchRequest, PagedResult, ProsessStatus } from '../../types/prosess.ts';
 import { prosessService } from '../../services/prosessService.ts';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 
-interface ProsessListeProps {
-  onProsessClick: (prosessId: number) => void;
-  onCreateProsess?: () => void;
-}
-
-export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCreateProsess }) => {
+export const ProsessListe: React.FC = () => {
   const { hasPermission } = useAuth();
+  const navigate = useNavigate();
+  
+  // Check if user can see all statuses (admins, process owners, QA, etc.)
+  const canSeeAllStatuses = hasPermission('edit_prosess') || 
+                           hasPermission('create_prosess') || 
+                           hasPermission('approve_prosess') || 
+                           hasPermission('view_qa_queue') || 
+                           hasPermission('manage_users') || 
+                           hasPermission('manage_roles');
+
   const [prosesses, setProsesses] = useState<PagedResult<ProsessListItem>>({
     items: [],
     totalCount: 0,
@@ -26,6 +32,16 @@ export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCr
     sortDescending: true
   });
   const [categories, setCategories] = useState<string[]>([]);
+
+  // Set default filtering for regular users
+  useEffect(() => {
+    if (!canSeeAllStatuses && !searchRequest.status) {
+      setSearchRequest(prev => ({
+        ...prev,
+        status: ProsessStatus.Published
+      }));
+    }
+  }, [canSeeAllStatuses]);
 
   useEffect(() => {
     loadProsesses();
@@ -124,9 +140,9 @@ export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCr
     <div className="prosess-liste">
       <div className="prosess-liste-header">
         <h2>📋 Prosessportal</h2>
-        {hasPermission('create_prosess') && onCreateProsess && (
+        {hasPermission('create_prosess') && (
           <button
-            onClick={onCreateProsess}
+            onClick={() => navigate('/opprett-prosess')}
             className="btn-create-prosess"
             title="Opprett ny prosess"
           >
@@ -156,18 +172,20 @@ export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCr
             ))}
           </select>
           
-          <select 
-            onChange={(e) => handleStatusFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">Alle statuser</option>
-            <option value={ProsessStatus.Draft}>Utkast</option>
-            <option value={ProsessStatus.InReview}>Under review</option>
-            <option value={ProsessStatus.Approved}>Godkjent</option>
-            <option value={ProsessStatus.Published}>Publisert</option>
-            <option value={ProsessStatus.Deprecated}>Utdatert</option>
-            <option value={ProsessStatus.Archived}>Arkivert</option>
-          </select>
+          {canSeeAllStatuses && (
+            <select 
+              onChange={(e) => handleStatusFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">Alle statuser</option>
+              <option value={ProsessStatus.Draft}>Utkast</option>
+              <option value={ProsessStatus.InReview}>Under review</option>
+              <option value={ProsessStatus.Approved}>Godkjent</option>
+              <option value={ProsessStatus.Published}>Publisert</option>
+              <option value={ProsessStatus.Deprecated}>Utdatert</option>
+              <option value={ProsessStatus.Archived}>Arkivert</option>
+            </select>
+          )}
         </div>
         
         <div className="sort-options">
@@ -215,16 +233,18 @@ export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCr
               <div 
                 key={prosess.id} 
                 className="prosess-card"
-                onClick={() => onProsessClick(prosess.id)}
+                onClick={() => navigate(`/prosess/${prosess.id}`)}
               >
                 <div className="card-header">
                   <h3 className="prosess-title">{prosess.title}</h3>
-                  <div 
-                    className="status-badge"
-                    style={{ backgroundColor: getStatusColor(prosess.status) }}
-                  >
-                    {getStatusText(prosess.status)}
-                  </div>
+                  {canSeeAllStatuses && (
+                    <div 
+                      className="status-badge"
+                      style={{ backgroundColor: getStatusColor(prosess.status) }}
+                    >
+                      {getStatusText(prosess.status)}
+                    </div>
+                  )}
                 </div>
                 
                 <p className="prosess-description">{prosess.description}</p>
