@@ -294,7 +294,6 @@ export const ProcessTemplateManager: React.FC<ProcessTemplateManagerProps> = ({
   };
 
   const validateProcessCompliance = (template: ProcessTemplate): ComplianceResult => {
-    const checks: ComplianceCheck[] = [];
     const passedChecks: ComplianceCheck[] = [];
     const failedChecks: ComplianceCheck[] = [];
     const recommendations: string[] = [];

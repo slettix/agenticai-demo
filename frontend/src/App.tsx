@@ -6,13 +6,14 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
 import { ProsessListe } from './components/prosess/ProsessListe.tsx';
 import { ProsessDetaljer } from './components/prosess/ProsessDetaljer.tsx';
 import { CreateProsessForm } from './components/prosess/CreateProsessForm.tsx';
+import TestComponent from './TestComponent.tsx';
 import './components/auth/auth.css';
 import './components/prosess/prosess.css';
 import './App.css';
 
 // Main App Content Component
 const AppContent: React.FC = () => {
-  const { user, logout, hasRole } = useAuth();
+  const { user, logout } = useAuth();
   const [showRegister, setShowRegister] = useState(false);
   const [currentView, setCurrentView] = useState<'prosesser' | 'prosess-detail' | 'create-prosess'>('prosesser');
   const [selectedProsessId, setSelectedProsessId] = useState<number | null>(null);
@@ -25,6 +26,7 @@ const AppContent: React.FC = () => {
           <p>Intelligent prosesshåndtering med AI-støtte</p>
         </header>
         <main>
+          <TestComponent />
           {showRegister ? (
             <RegisterForm 
               onRegisterSuccess={() => setShowRegister(false)}

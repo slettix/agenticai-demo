@@ -41,21 +41,23 @@ export const AIProcessSuggestions: React.FC<AIProcessSuggestionsProps> = ({
 
   // Mock AI suggestions based on process context
   useEffect(() => {
+    const generateMockSuggestions = () => {
+      setGeneratingSuggestions(true);
+      
+      // Simulate AI processing delay
+      setTimeout(() => {
+        const mockSuggestions = generateContextualSuggestions();
+        setSuggestions(mockSuggestions);
+        setGeneratingSuggestions(false);
+      }, 1500);
+    };
+
     if (processTitle || processDescription) {
       generateMockSuggestions();
     }
-  }, [processTitle, processDescription, category, itilArea, currentSteps]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [processTitle, processDescription, category, itilArea]);
 
-  const generateMockSuggestions = () => {
-    setGeneratingSuggestions(true);
-    
-    // Simulate AI processing delay
-    setTimeout(() => {
-      const mockSuggestions = generateContextualSuggestions();
-      setSuggestions(mockSuggestions);
-      setGeneratingSuggestions(false);
-    }, 1500);
-  };
 
   const generateContextualSuggestions = (): AISuggestion[] => {
     const suggestions: AISuggestion[] = [];

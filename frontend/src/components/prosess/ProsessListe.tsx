@@ -30,6 +30,7 @@ export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCr
   useEffect(() => {
     loadProsesses();
     loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchRequest]);
 
   const loadProsesses = async () => {
@@ -48,8 +49,8 @@ export const ProsessListe: React.FC<ProsessListeProps> = ({ onProsessClick, onCr
 
   const loadCategories = async () => {
     try {
-      const cats = await prosessService.getCategories();
-      setCategories(cats);
+      const categoriesData = await prosessService.getCategories();
+      setCategories(categoriesData.businessCategories || []);
     } catch (err) {
       console.error('Error loading categories:', err);
     }

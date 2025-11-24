@@ -17,6 +17,7 @@ export const ProsessDetaljer: React.FC<ProsessDetaljerProps> = ({ prosessId, onB
 
   useEffect(() => {
     loadProsess();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prosessId]);
 
   const loadProsess = async () => {

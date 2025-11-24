@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { prosessService } from '../../services/prosessService';
-import { ProcessStepBuilder, ProcessStep } from './ProcessStepBuilder';
-import { AIProcessSuggestions } from './AIProcessSuggestions';
-import { ProcessTemplateManager } from './ProcessTemplateManager';
+import { prosessService } from '../../services/prosessService.ts';
+import { ProcessStepBuilder, ProcessStep } from './ProcessStepBuilder.tsx';
+import { AIProcessSuggestions } from './AIProcessSuggestions.tsx';
+import { ProcessTemplateManager } from './ProcessTemplateManager.tsx';
 import './CreateProsessForm.css';
 
 interface CreateProsessFormProps {
@@ -36,7 +35,6 @@ interface ProsessCategories {
 }
 
 export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess, onCancel }) => {
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -76,16 +74,20 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
   const loadCategories = async () => {
     try {
       const categoriesData = await prosessService.getCategories();
+      console.log('Categories data received:', categoriesData);
       setCategories(categoriesData);
     } catch (err) {
+      console.error('Error loading categories:', err);
       setError('Kunne ikke laste kategorier');
     }
   };
 
   const loadTemplatesForArea = async (area: string) => {
     try {
+      console.log('Loading templates for area:', area);
       const templatesData = await prosessService.getITILTemplates(area);
-      setTemplates(templatesData);
+      console.log('Templates data received:', templatesData);
+      setTemplates(templatesData || []);
     } catch (err) {
       console.error('Kunne ikke laste ITIL-maler:', err);
       setTemplates([]);
@@ -191,7 +193,7 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
     }
   };
 
-  const handleTemplateSelect = (template: any) => {
+  const handleProcessTemplateSelect = (template: any) => {
     setSelectedProcessTemplate(template);
     
     // Auto-fill form data from template
@@ -277,7 +279,7 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
               >
                 <option value="">Velg kategori</option>
                 <optgroup label="Forretningsområder">
-                  {categories.businessCategories.map(cat => (
+                  {categories?.businessCategories?.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </optgroup>
@@ -294,7 +296,7 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
                 value={formData.priority}
                 onChange={(e) => handleInputChange('priority', e.target.value)}
               >
-                {categories.priorities.map(priority => (
+                {categories?.priorities?.map(priority => (
                   <option key={priority} value={priority}>{priority}</option>
                 ))}
               </select>
@@ -314,23 +316,23 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
               onChange={(e) => handleInputChange('itilArea', e.target.value)}
             >
               <option value="">Velg ITIL-område (valgfritt)</option>
-              {categories.itilAreas.map(area => (
+              {categories?.itilAreas?.map(area => (
                 <option key={area.name} value={area.name}>{area.name}</option>
               ))}
             </select>
             {formData.itilArea && (
               <small className="field-help">
-                {categories.itilAreas.find(a => a.name === formData.itilArea)?.description}
+                {categories?.itilAreas?.find(a => a.name === formData.itilArea)?.description}
               </small>
             )}
           </div>
 
           {/* ITIL-maler */}
-          {templates.length > 0 && (
+          {templates && templates.length > 0 && (
             <div className="form-group">
               <label>ITIL-prosessmaler</label>
               <div className="template-grid">
-                {templates.map(template => (
+                {templates?.map(template => (
                   <div
                     key={template.name}
                     className={`template-card ${selectedTemplate?.name === template.name ? 'selected' : ''}`}
@@ -339,8 +341,8 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
                     <h4>{template.name}</h4>
                     <p>{template.purpose}</p>
                     <div className="template-meta">
-                      <span>📋 {template.defaultSteps.length} steg</span>
-                      <span>📊 {template.kpis.length} KPI-er</span>
+                      <span>📋 {template.defaultSteps?.length || 0} steg</span>
+                      <span>📊 {template.kpis?.length || 0} KPI-er</span>
                     </div>
                   </div>
                 ))}
@@ -445,7 +447,7 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
             <div className="template-steps-preview">
               <h4>📋 Forhåndsdefinerte trinn fra {selectedTemplate.name}</h4>
               <div className="template-steps">
-                {selectedTemplate.defaultSteps.map((step: any, index: number) => (
+                {selectedTemplate?.defaultSteps?.map((step: any, index: number) => (
                   <div key={index} className="template-step">
                     <span className="step-number">{index + 1}</span>
                     <div className="step-content">
@@ -506,7 +508,7 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
             <ProcessTemplateManager
               itilArea={formData.itilArea}
               category={formData.category}
-              onTemplateSelect={handleTemplateSelect}
+              onTemplateSelect={handleProcessTemplateSelect}
               onValidateCompliance={handleValidateCompliance}
               selectedTemplate={selectedProcessTemplate}
             />
@@ -523,7 +525,7 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
                 <p>{selectedProcessTemplate.description}</p>
                 <div className="template-details">
                   <span>🎯 ITIL: {selectedProcessTemplate.itilArea}</span>
-                  <span>📊 {selectedProcessTemplate.defaultSteps.length} trinn</span>
+                  <span>📊 {selectedProcessTemplate.defaultSteps?.length || 0} trinn</span>
                   <span>⏱️ {selectedProcessTemplate.estimatedDuration} min</span>
                   <span>🏆 {selectedProcessTemplate.maturityLevel}</span>
                 </div>
