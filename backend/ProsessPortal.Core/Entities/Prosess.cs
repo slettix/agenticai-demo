@@ -17,6 +17,10 @@ public class Prosess
     public int? OwnerId { get; set; }
     public User? Owner { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAt { get; set; }
+    public int? DeletedByUserId { get; set; }
+    public User? DeletedByUser { get; set; }
     public int ViewCount { get; set; } = 0;
     public DateTime? LastAccessedAt { get; set; }
     
@@ -35,5 +39,6 @@ public enum ProsessStatus
     Rejected = 4,
     Published = 5,
     Deprecated = 6,
-    Archived = 7
+    Archived = 7,
+    Deleted = 8
 }

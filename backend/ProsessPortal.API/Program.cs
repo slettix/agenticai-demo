@@ -112,6 +112,7 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IProsessService, ProsessService>();
 builder.Services.AddScoped<IApprovalService, ApprovalService>();
 builder.Services.AddScoped<IEditingService, EditingService>();
+builder.Services.AddScoped<IDeletionService, DeletionService>();
 
 // HTTP client for agent service
 builder.Services.AddHttpClient<IAgentService, AgentService>(client =>
@@ -140,6 +141,50 @@ using (var scope = app.Services.CreateScope())
         else
         {
             Log.Information("Database schema already exists");
+        }
+        
+        // Add new deletion columns if they don't exist
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync(@"
+                DO $$ 
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Prosesser' AND column_name = 'IsDeleted') THEN
+                        ALTER TABLE ""Prosesser"" ADD COLUMN ""IsDeleted"" boolean NOT NULL DEFAULT FALSE;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Prosesser' AND column_name = 'DeletedAt') THEN
+                        ALTER TABLE ""Prosesser"" ADD COLUMN ""DeletedAt"" timestamp with time zone NULL;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Prosesser' AND column_name = 'DeletedByUserId') THEN
+                        ALTER TABLE ""Prosesser"" ADD COLUMN ""DeletedByUserId"" integer NULL;
+                    END IF;
+                END $$;
+            ");
+            
+            // Create ProsessDeletionHistory table if it doesn't exist
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE IF NOT EXISTS ""ProsessDeletionHistory"" (
+                    ""Id"" serial PRIMARY KEY,
+                    ""ProsessId"" integer NOT NULL,
+                    ""UserId"" integer NOT NULL,
+                    ""Action"" varchar(50) NOT NULL,
+                    ""Reason"" varchar(1000),
+                    ""ActionAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                    FOREIGN KEY (""ProsessId"") REFERENCES ""Prosesser""(""Id"") ON DELETE CASCADE,
+                    FOREIGN KEY (""UserId"") REFERENCES ""Users""(""Id"") ON DELETE RESTRICT
+                );
+            ");
+            
+            Log.Information("Database schema updated with deletion fields");
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Could not update database schema - this may be expected if columns already exist");
         }
 
         // Ensure admin user exists with correct password hash

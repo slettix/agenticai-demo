@@ -9,6 +9,7 @@ import { ProsessDetail } from './components/prosess/ProsessDetail.tsx';
 import { CreateProsessForm } from './components/prosess/CreateProsessForm.tsx';
 import { ProsessEditor } from './components/prosess/ProsessEditor.tsx';
 import { ApprovalQueue } from './components/approval/ApprovalQueue.tsx';
+import { DeletedProcessesList } from './components/deletion/DeletedProcessesList.tsx';
 import TestComponent from './TestComponent.tsx';
 import './components/auth/auth.css';
 import './components/prosess/prosess.css';
@@ -29,6 +30,10 @@ const Navigation: React.FC = () => {
         
         <ProtectedRoute requiredPermission="view_qa_queue">
           <li><Link to="/godkjenning">✅ Til godkjenning</Link></li>
+        </ProtectedRoute>
+        
+        <ProtectedRoute requiredPermission="delete_prosess">
+          <li><Link to="/slettede-prosesser">🗑️ Slettede prosesser</Link></li>
         </ProtectedRoute>
         
         <ProtectedRoute requiredRole="ProsessEier">
@@ -106,6 +111,14 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute requiredPermission="view_qa_queue">
                   <ApprovalQueue />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/slettede-prosesser" 
+              element={
+                <ProtectedRoute requiredPermission="delete_prosess">
+                  <DeletedProcessesList />
                 </ProtectedRoute>
               } 
             />

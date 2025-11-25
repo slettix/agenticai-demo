@@ -32,6 +32,9 @@ public class ProsessPortalDbContext : DbContext
     public DbSet<ProsessEditConflict> ProsessEditConflicts { get; set; }
     public DbSet<ProsessAutoSave> ProsessAutoSaves { get; set; }
     
+    // Deletion entities
+    public DbSet<ProsessDeletionHistory> ProsessDeletionHistory { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -136,9 +139,15 @@ public class ProsessPortalDbContext : DbContext
                 .HasForeignKey(e => e.OwnerId)
                 .OnDelete(DeleteBehavior.SetNull);
                 
+            entity.HasOne(e => e.DeletedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.DeletedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
             entity.HasIndex(e => e.Title);
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.IsDeleted);
         });
         
         // ProsessVersion configuration
@@ -439,6 +448,27 @@ public class ProsessPortalDbContext : DbContext
                 
             entity.HasIndex(e => e.SessionId);
             entity.HasIndex(e => e.SavedAt);
+        });
+        
+        // ProsessDeletionHistory configuration
+        modelBuilder.Entity<ProsessDeletionHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Action).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Reason).HasMaxLength(1000);
+            
+            entity.HasOne(e => e.Prosess)
+                .WithMany()
+                .HasForeignKey(e => e.ProsessId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.ProsessId);
+            entity.HasIndex(e => e.ActionAt);
         });
         
         // Seed sample processes

@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { prosessService } from '../../services/prosessService.ts';
+import { deletionService } from '../../services/deletionService.ts';
 import { ProsessDetail as ProsessDetailType, ProsessStep } from '../../types/prosess.ts';
 import { ProcessFlowVisualization } from './ProcessFlowVisualization.tsx';
 import { ProcessStepDetailModal } from './ProcessStepDetailModal.tsx';
+import { DeleteConfirmationModal } from '../deletion/DeleteConfirmationModal.tsx';
+import { useAuth } from '../../contexts/AuthContext.tsx';
 import './ProsessDetail.css';
 
 export const ProsessDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { hasPermission } = useAuth();
   const [prosess, setProsess] = useState<ProsessDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedStep, setSelectedStep] = useState<ProsessStep | null>(null);
   const [selectedStepIndex, setSelectedStepIndex] = useState<number>(-1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
+  const [hasActiveInstances, setHasActiveInstances] = useState(false);
 
   useEffect(() => {
     const loadProsess = async () => {
@@ -23,18 +30,39 @@ export const ProsessDetail: React.FC = () => {
         return;
       }
 
+      console.log('Loading prosess with ID:', id, 'parsed:', parseInt(id));
+
       try {
         const prosessDetail = await prosessService.getProsess(parseInt(id));
         if (prosessDetail) {
           setProsess(prosessDetail);
           // Record view
           await prosessService.recordView(parseInt(id));
+          
+          // Check deletion permissions and active instances
+          try {
+            console.log('Checking deletion permissions for prosess ID:', parseInt(id));
+            const [canDeleteResult, hasActiveResult] = await Promise.all([
+              deletionService.canUserDelete(parseInt(id)),
+              deletionService.hasActiveInstances(parseInt(id))
+            ]);
+            console.log('Deletion check results:', { canDeleteResult, hasActiveResult });
+            setCanDelete(canDeleteResult);
+            setHasActiveInstances(hasActiveResult);
+          } catch (err) {
+            console.error('Could not check deletion permissions:', err);
+            // Set canDelete to false if there's an error
+            setCanDelete(false);
+            setHasActiveInstances(false);
+          }
         } else {
           setError('Prosessen ble ikke funnet');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error loading prosess:', err);
-        setError('Kunne ikke laste prosessen');
+        console.error('Error message:', err.message);
+        console.error('Error stack:', err.stack);
+        setError(`Kunne ikke laste prosessen: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -71,11 +99,13 @@ export const ProsessDetail: React.FC = () => {
   const getStatusColor = (status: number): string => {
     switch (status) {
       case 0: return '#6c757d'; // Draft
-      case 1: return '#ffc107'; // InReview
-      case 2: return '#28a745'; // Approved
-      case 3: return '#007bff'; // Published
-      case 4: return '#fd7e14'; // Deprecated
-      case 5: return '#dc3545'; // Archived
+      case 1: return '#ffc107'; // PendingApproval
+      case 2: return '#007bff'; // InReview
+      case 3: return '#28a745'; // Approved
+      case 4: return '#dc3545'; // Rejected
+      case 5: return '#10b981'; // Published
+      case 6: return '#fd7e14'; // Deprecated
+      case 7: return '#6c757d'; // Archived
       default: return '#6c757d';
     }
   };
@@ -83,11 +113,13 @@ export const ProsessDetail: React.FC = () => {
   const getStatusText = (status: number): string => {
     switch (status) {
       case 0: return 'Utkast';
-      case 1: return 'Til gjennomgang';
-      case 2: return 'Godkjent';
-      case 3: return 'Publisert';
-      case 4: return 'Utdatert';
-      case 5: return 'Arkivert';
+      case 1: return 'Venter på godkjenning';
+      case 2: return 'Til gjennomgang';
+      case 3: return 'Godkjent';
+      case 4: return 'Avvist';
+      case 5: return 'Publisert';
+      case 6: return 'Utdatert';
+      case 7: return 'Arkivert';
       default: return 'Ukjent';
     }
   };
@@ -105,6 +137,23 @@ export const ProsessDetail: React.FC = () => {
   const getTotalDuration = (): number => {
     if (!prosess?.steps) return 0;
     return prosess.steps.reduce((total, step) => total + (step.estimatedDurationMinutes || 0), 0);
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async (reason: string, forceDelete: boolean) => {
+    if (!prosess || !id) return;
+
+    try {
+      await deletionService.softDeleteProcess(parseInt(id), { reason, forceDelete });
+      setShowDeleteModal(false);
+      alert(`Prosessen "${prosess.title}" ble slettet!`);
+      navigate('/prosesser');
+    } catch (err: any) {
+      alert(`Feil ved sletting: ${err.message}`);
+    }
   };
 
   if (loading) {
@@ -164,9 +213,22 @@ export const ProsessDetail: React.FC = () => {
             <button className="btn-secondary">
               📊 Statistikk
             </button>
-            <button className="btn-secondary">
+            <button 
+              className="btn-secondary"
+              onClick={() => navigate(`/prosess/${id}/rediger`)}
+            >
               📝 Rediger
             </button>
+            
+            {canDelete && (
+              <button 
+                className="btn-danger"
+                onClick={handleDeleteClick}
+                title={hasActiveInstances ? 'Prosessen har aktive instanser' : 'Slett prosess'}
+              >
+                🗑️ Slett
+              </button>
+            )}
             <button className="btn-primary">
               ▶️ Start prosess
             </button>
@@ -309,6 +371,17 @@ export const ProsessDetail: React.FC = () => {
           onPrevious={handlePreviousStep}
           onNext={handleNextStep}
           showNavigation={true}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && prosess && (
+        <DeleteConfirmationModal
+          prosess={prosess}
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteConfirm}
+          hasActiveInstances={hasActiveInstances}
         />
       )}
     </div>

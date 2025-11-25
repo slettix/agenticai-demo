@@ -21,7 +21,7 @@ public class ProsessService : IProsessService
             .Include(p => p.CreatedByUser)
             .Include(p => p.Owner)
             .Include(p => p.Tags)
-            .Where(p => p.IsActive)
+            .Where(p => p.IsActive && !p.IsDeleted)
             .AsQueryable();
 
         // Apply role-based filtering
@@ -154,7 +154,7 @@ public class ProsessService : IProsessService
                 .ThenInclude(v => v.CreatedByUser)
             .Include(p => p.Versions)
                 .ThenInclude(v => v.PublishedByUser)
-            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
+            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive && !p.IsDeleted);
 
         if (prosess == null) return null;
 
@@ -270,7 +270,7 @@ public class ProsessService : IProsessService
     {
         var prosess = await _context.Prosesser
             .Include(p => p.Tags)
-            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
+            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive && !p.IsDeleted);
 
         if (prosess == null) return null;
 
@@ -321,7 +321,7 @@ public class ProsessService : IProsessService
             .Include(p => p.CreatedByUser)
             .Include(p => p.Owner)
             .Include(p => p.Tags)
-            .Where(p => p.IsActive)
+            .Where(p => p.IsActive && !p.IsDeleted)
             .ToListAsync();
 
         var totalProsesses = prosesses.Count;
@@ -358,7 +358,7 @@ public class ProsessService : IProsessService
     public async Task<ICollection<string>> GetCategoriesAsync()
     {
         return await _context.Prosesser
-            .Where(p => p.IsActive)
+            .Where(p => p.IsActive && !p.IsDeleted)
             .Select(p => p.Category)
             .Distinct()
             .OrderBy(c => c)
