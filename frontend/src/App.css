@@ -1,4 +1,23 @@
-/* Global App Styles */
+/* Global App Styles - Norwegian Armed Forces Theme */
+:root {
+  --forsvaret-navy: #191b21;
+  --forsvaret-teal: #89bcbc;
+  --forsvaret-light-teal: #b8d0d0;
+  --forsvaret-very-light-teal: #e8f2f2;
+  --forsvaret-dark-navy: #0f1014;
+  --forsvaret-gray: #6c757d;
+  --forsvaret-light-gray: #f8f9fa;
+  --forsvaret-very-light-gray: #ffffff;
+  --forsvaret-white: #ffffff;
+  --forsvaret-accent: #4a90a4;
+  --forsvaret-success: #28a745;
+  --forsvaret-warning: #ffc107;
+  --forsvaret-text: #212529;
+  --forsvaret-text-muted: #6c757d;
+  --forsvaret-red: #dc3545;
+  --forsvaret-gold: #ffc107;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,8 +30,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f8f9fa;
+  background-color: var(--forsvaret-light-gray);
   line-height: 1.6;
+  font-weight: 400;
+  color: var(--forsvaret-text);
 }
 
 .app {
@@ -21,26 +42,30 @@ body {
   flex-direction: column;
 }
 
-/* Header Styles */
+/* Header Styles - Norwegian Armed Forces */
 .app-header {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--forsvaret-white);
+  color: var(--forsvaret-text);
+  padding: 1.5rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--forsvaret-very-light-teal);
 }
 
 .app-header h1 {
   text-align: center;
   margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--forsvaret-navy);
 }
 
 .app-header p {
   text-align: center;
-  margin: 0.5rem 0 0 0;
-  opacity: 0.9;
-  font-size: 1.1rem;
+  margin: 0.75rem 0 0 0;
+  font-size: 1.125rem;
+  color: var(--forsvaret-text-muted);
+  font-weight: 400;
 }
 
 .header-content {
@@ -66,33 +91,39 @@ body {
 }
 
 .role-badge {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  background: var(--forsvaret-very-light-teal);
+  color: var(--forsvaret-navy);
+  padding: 0.3rem 0.75rem;
+  border-radius: 16px;
   font-size: 0.8rem;
   font-weight: 500;
+  border: 1px solid var(--forsvaret-light-teal);
 }
 
 .logout-button {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
+  background: var(--forsvaret-white);
+  color: var(--forsvaret-text);
+  border: 1px solid var(--forsvaret-light-teal);
+  padding: 0.6rem 1.25rem;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background-color 0.2s;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .logout-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--forsvaret-accent);
+  color: var(--forsvaret-white);
+  border-color: var(--forsvaret-accent);
 }
 
 /* Navigation Styles */
 .app-nav {
-  background: white;
-  border-bottom: 1px solid #ddd;
+  background: var(--forsvaret-white);
+  border-bottom: 1px solid var(--forsvaret-light-teal);
   padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .app-nav ul {
@@ -109,29 +140,34 @@ body {
   display: block;
   padding: 1rem 0;
   text-decoration: none;
-  color: #495057;
+  color: var(--forsvaret-text-muted);
   font-weight: 500;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
   font-size: inherit;
   font-family: inherit;
   width: 100%;
   text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.95rem;
 }
 
 .app-nav li a:hover,
 .app-nav li button:hover {
-  color: #007bff;
-  border-bottom-color: #007bff;
+  color: var(--forsvaret-accent);
+  border-bottom-color: var(--forsvaret-accent);
+  transform: none;
 }
 
 .app-nav li button.active {
-  color: #007bff;
-  border-bottom-color: #007bff;
+  color: var(--forsvaret-accent);
+  border-bottom-color: var(--forsvaret-accent);
+  font-weight: 600;
 }
 
 /* Main Content Styles */
@@ -139,8 +175,10 @@ body {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2.5rem 1.5rem;
   width: 100%;
+  background: var(--forsvaret-white);
+  min-height: calc(100vh - 200px);
 }
 
 .welcome-content {
@@ -148,13 +186,14 @@ body {
 }
 
 .welcome-content h2 {
-  color: #333;
+  color: var(--forsvaret-text);
   margin-bottom: 1rem;
   font-size: 2rem;
+  font-weight: 600;
 }
 
 .welcome-content > p {
-  color: #666;
+  color: var(--forsvaret-text-muted);
   font-size: 1.1rem;
   margin-bottom: 2rem;
 }
@@ -171,28 +210,35 @@ body {
 }
 
 .feature-card {
-  background: white;
-  padding: 1.5rem;
+  background: var(--forsvaret-white);
+  padding: 1.75rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   text-align: left;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
+  border: 1px solid var(--forsvaret-very-light-teal);
+  position: relative;
+  overflow: hidden;
 }
+
 
 .feature-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--forsvaret-light-teal);
 }
 
 .feature-card h3 {
-  color: #333;
-  margin-bottom: 0.5rem;
+  color: var(--forsvaret-text);
+  margin-bottom: 0.75rem;
   font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .feature-card p {
-  color: #666;
+  color: var(--forsvaret-text-muted);
   margin: 0;
+  line-height: 1.6;
 }
 
 /* Status Info */

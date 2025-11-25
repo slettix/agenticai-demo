@@ -10,6 +10,7 @@ import { CreateProsessForm } from './components/prosess/CreateProsessForm.tsx';
 import { ProsessEditor } from './components/prosess/ProsessEditor.tsx';
 import { ApprovalQueue } from './components/approval/ApprovalQueue.tsx';
 import { DeletedProcessesList } from './components/deletion/DeletedProcessesList.tsx';
+import { ForsvaretLogo } from './components/common/ForsvaretLogo.tsx';
 import TestComponent from './TestComponent.tsx';
 import './components/auth/auth.css';
 import './components/prosess/prosess.css';
@@ -25,23 +26,23 @@ const Navigation: React.FC = () => {
     <nav className="app-nav">
       <ul>
         <li>
-          <Link to="/prosesser">📋 Prosesser</Link>
+          <Link to="/prosesser">📋 Operasjonsprosedyrer</Link>
         </li>
         
         <ProtectedRoute requiredPermission="view_qa_queue">
-          <li><Link to="/godkjenning">✅ Til godkjenning</Link></li>
+          <li><Link to="/godkjenning">✅ Til kvalitetssikring</Link></li>
         </ProtectedRoute>
         
         <ProtectedRoute requiredPermission="delete_prosess">
-          <li><Link to="/slettede-prosesser">🗑️ Slettede prosesser</Link></li>
+          <li><Link to="/slettede-prosesser">🗑️ Arkiverte prosedyrer</Link></li>
         </ProtectedRoute>
         
         <ProtectedRoute requiredRole="ProsessEier">
-          <li><a href="#mine-prosesser">📝 Mine prosesser</a></li>
+          <li><a href="#mine-prosesser">📝 Mine prosedyrer</a></li>
         </ProtectedRoute>
         
         <ProtectedRoute requiredRole="Admin">
-          <li><a href="#admin">⚙️ Administrasjon</a></li>
+          <li><a href="#admin">⚙️ Systemadministrasjon</a></li>
         </ProtectedRoute>
       </ul>
     </nav>
@@ -57,8 +58,13 @@ const AppContent: React.FC = () => {
     return (
       <div className="app">
         <header className="app-header">
-          <h1>🏢 Prosessportal</h1>
-          <p>Intelligent prosesshåndtering med AI-støtte</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <ForsvaretLogo size="large" />
+              <h1>Forsvarets Prosessportal</h1>
+            </div>
+            <p>Sikker prosedyrehåndtering med AI-assistanse</p>
+          </div>
         </header>
         <main>
           <TestComponent />
@@ -82,9 +88,12 @@ const AppContent: React.FC = () => {
       <div className="app">
         <header className="app-header">
           <div className="header-content">
-            <h1>🏢 Prosessportal</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <ForsvaretLogo size="medium" />
+              <h1>Forsvarets Prosessportal</h1>
+            </div>
             <div className="user-info">
-              <span>Velkommen, {user.firstName} {user.lastName}</span>
+              <span>Innlogget: {user.firstName} {user.lastName}</span>
               <span className="user-roles">
                 {user.roles.map(role => (
                   <span key={role} className="role-badge">{role}</span>

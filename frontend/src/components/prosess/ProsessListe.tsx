@@ -111,10 +111,10 @@ export const ProsessListe: React.FC = () => {
   const getStatusText = (status: ProsessStatus): string => {
     switch (status) {
       case ProsessStatus.Draft: return 'Utkast';
-      case ProsessStatus.InReview: return 'Under review';
+      case ProsessStatus.InReview: return 'Kvalitetssikring';
       case ProsessStatus.Approved: return 'Godkjent';
-      case ProsessStatus.Published: return 'Publisert';
-      case ProsessStatus.Deprecated: return 'Utdatert';
+      case ProsessStatus.Published: return 'Operativ';
+      case ProsessStatus.Deprecated: return 'Utfaset';
       case ProsessStatus.Archived: return 'Arkivert';
       default: return 'Ukjent';
     }
@@ -125,7 +125,7 @@ export const ProsessListe: React.FC = () => {
       case ProsessStatus.Draft: return '#6c757d';
       case ProsessStatus.InReview: return '#ffc107';
       case ProsessStatus.Approved: return '#28a745';
-      case ProsessStatus.Published: return '#007bff';
+      case ProsessStatus.Published: return '#4a90a4'; // Forsvaret accent color
       case ProsessStatus.Deprecated: return '#fd7e14';
       case ProsessStatus.Archived: return '#dc3545';
       default: return '#6c757d';
@@ -139,14 +139,14 @@ export const ProsessListe: React.FC = () => {
   return (
     <div className="prosess-liste">
       <div className="prosess-liste-header">
-        <h2>📋 Prosessportal</h2>
+        <h2>📋 Operasjonsprosedyrer</h2>
         {hasPermission('create_prosess') && (
           <button
             onClick={() => navigate('/opprett-prosess')}
             className="btn-create-prosess"
-            title="Opprett ny prosess"
+            title="Opprett ny operasjonsprosedyre"
           >
-            ➕ Ny prosess
+            ➕ Ny prosedyre
           </button>
         )}
       </div>
@@ -155,7 +155,7 @@ export const ProsessListe: React.FC = () => {
         <div className="search-bar">
           <input
             type="text"
-            placeholder="Søk i prosesser..."
+            placeholder="Søk i operasjonsprosedyrer..."
             onChange={(e) => handleSearch(e.target.value)}
             className="search-input"
           />
@@ -179,10 +179,10 @@ export const ProsessListe: React.FC = () => {
             >
               <option value="">Alle statuser</option>
               <option value={ProsessStatus.Draft}>Utkast</option>
-              <option value={ProsessStatus.InReview}>Under review</option>
+              <option value={ProsessStatus.InReview}>Kvalitetssikring</option>
               <option value={ProsessStatus.Approved}>Godkjent</option>
-              <option value={ProsessStatus.Published}>Publisert</option>
-              <option value={ProsessStatus.Deprecated}>Utdatert</option>
+              <option value={ProsessStatus.Published}>Operativ</option>
+              <option value={ProsessStatus.Deprecated}>Utfaset</option>
               <option value={ProsessStatus.Archived}>Arkivert</option>
             </select>
           )}
@@ -219,10 +219,10 @@ export const ProsessListe: React.FC = () => {
 
       {prosesses.items.length === 0 && !loading ? (
         <div className="no-results">
-          <h3>Ingen prosesser funnet</h3>
+          <h3>Ingen operasjonsprosedyrer funnet</h3>
           <p>Prøv å endre søkekriteriene eller 
             {hasPermission('create_prosess') && (
-              <span> <button className="link-button">opprett en ny prosess</button></span>
+              <span> <button className="link-button">opprett en ny operasjonsprosedyre</button></span>
             )}
           </p>
         </div>
@@ -235,16 +235,16 @@ export const ProsessListe: React.FC = () => {
                 className="prosess-card"
                 onClick={() => navigate(`/prosess/${prosess.id}`)}
               >
+                {canSeeAllStatuses && (
+                  <div 
+                    className="status-badge status-badge-corner"
+                    style={{ backgroundColor: getStatusColor(prosess.status) }}
+                  >
+                    {getStatusText(prosess.status)}
+                  </div>
+                )}
                 <div className="card-header">
                   <h3 className="prosess-title">{prosess.title}</h3>
-                  {canSeeAllStatuses && (
-                    <div 
-                      className="status-badge"
-                      style={{ backgroundColor: getStatusColor(prosess.status) }}
-                    >
-                      {getStatusText(prosess.status)}
-                    </div>
-                  )}
                 </div>
                 
                 <p className="prosess-description">{prosess.description}</p>

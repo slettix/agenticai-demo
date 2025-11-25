@@ -1,4 +1,4 @@
-/* Prosess Components Styles */
+/* Prosess Components Styles - Norwegian Armed Forces Theme */
 
 /* Loading and Error States */
 .loading-spinner {
@@ -7,7 +7,7 @@
   align-items: center;
   padding: 2rem;
   font-size: 1.1rem;
-  color: #666;
+  color: var(--forsvaret-gray, #6c757d);
 }
 
 .error-message {
@@ -41,13 +41,14 @@
 
 .prosess-liste-header h2 {
   margin: 0;
-  color: #2c3e50;
+  color: var(--forsvaret-navy, #191b21);
   font-size: 1.8rem;
+  font-weight: 600;
 }
 
 .btn-create-prosess {
-  background: #28a745;
-  color: white;
+  background: var(--forsvaret-accent, #4a90a4);
+  color: var(--forsvaret-white, #ffffff);
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
@@ -148,6 +149,7 @@
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid #e9ecef;
+  position: relative;
 }
 
 .prosess-card:hover {
@@ -156,18 +158,17 @@
 }
 
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   margin-bottom: 1rem;
+  margin-top: 1.5rem; /* Extra space below status badge */
 }
 
 .prosess-title {
   margin: 0;
   font-size: 1.25rem;
-  color: #333;
-  flex: 1;
-  margin-right: 1rem;
+  color: var(--forsvaret-text, #333);
+  font-weight: 600;
+  padding-right: 4rem; /* Space for status badge */
+  line-height: 1.3;
 }
 
 .status-badge {
@@ -177,6 +178,21 @@
   font-size: 0.8rem;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* Status badge positioned in top-right corner */
+.status-badge-corner {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  min-width: fit-content;
+  text-align: center;
 }
 
 .prosess-description {
