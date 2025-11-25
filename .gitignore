@@ -27,8 +27,9 @@ logs/
 .DS_Store
 
 # IDE
-.vscode/
 .idea/
+# Allow VSCode config to share debug settings with team
+# .vscode/
 
 # Temporary files
 *.tmp

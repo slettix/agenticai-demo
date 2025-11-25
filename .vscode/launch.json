@@ -1,0 +1,60 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET API (Backend)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-backend",
+            "program": "${workspaceFolder}/backend/ProsessPortal.API/bin/Debug/net9.0/ProsessPortal.API.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/backend/ProsessPortal.API",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5001"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/backend/ProsessPortal.API/Views"
+            },
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python AI Agents",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/agents/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/agents",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/agents"
+            },
+            "args": []
+        },
+        {
+            "name": "Python AI Agents (Simple)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/agents/simple_main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/agents",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/agents"
+            },
+            "args": []
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Backend + AI Agents",
+            "configurations": [
+                ".NET API (Backend)",
+                "Python AI Agents"
+            ]
+        }
+    ]
+}
