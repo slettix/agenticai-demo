@@ -10,10 +10,11 @@ import { CreateProsessForm } from './components/prosess/CreateProsessForm.tsx';
 import { ProsessEditor } from './components/prosess/ProsessEditor.tsx';
 import { ApprovalQueue } from './components/approval/ApprovalQueue.tsx';
 import { DeletedProcessesList } from './components/deletion/DeletedProcessesList.tsx';
+import { ActorManagement } from './components/actors/ActorManagement.tsx';
 import { ForsvaretLogo } from './components/common/ForsvaretLogo.tsx';
-import TestComponent from './TestComponent.tsx';
 import './components/auth/auth.css';
 import './components/prosess/prosess.css';
+import './components/actors/actors.css';
 import './App.css';
 
 // Navigation Component
@@ -42,6 +43,10 @@ const Navigation: React.FC = () => {
         </ProtectedRoute>
         
         <ProtectedRoute requiredRole="Admin">
+          <li><Link to="/aktorer">👥 Aktører og Roller</Link></li>
+        </ProtectedRoute>
+        
+        <ProtectedRoute requiredRole="Admin">
           <li><a href="#admin">⚙️ Systemadministrasjon</a></li>
         </ProtectedRoute>
       </ul>
@@ -67,7 +72,6 @@ const AppContent: React.FC = () => {
           </div>
         </header>
         <main>
-          <TestComponent />
           {showRegister ? (
             <RegisterForm 
               onRegisterSuccess={() => setShowRegister(false)}
@@ -128,6 +132,14 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute requiredPermission="delete_prosess">
                   <DeletedProcessesList />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/aktorer" 
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <ActorManagement />
                 </ProtectedRoute>
               } 
             />

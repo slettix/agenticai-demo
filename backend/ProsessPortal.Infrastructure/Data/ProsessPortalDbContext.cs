@@ -15,6 +15,11 @@ public class ProsessPortalDbContext : DbContext
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     
+    // Actor entities
+    public DbSet<Actor> Actors { get; set; }
+    public DbSet<ActorRole> ActorRoles { get; set; }
+    public DbSet<ActorNote> ActorNotes { get; set; }
+    
     // Process entities
     public DbSet<Prosess> Prosesser { get; set; }
     public DbSet<ProsessVersion> ProsessVersions { get; set; }
@@ -92,6 +97,85 @@ public class ProsessPortalDbContext : DbContext
             entity.HasOne(e => e.Permission)
                 .WithMany(e => e.RolePermissions)
                 .HasForeignKey(e => e.PermissionId);
+        });
+        
+        // Actor configuration
+        modelBuilder.Entity<Actor>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.Property(e => e.FirstName).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.LastName).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Email).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.OrganizationName).HasMaxLength(100);
+            entity.Property(e => e.Department).HasMaxLength(100);
+            entity.Property(e => e.Position).HasMaxLength(100);
+            entity.Property(e => e.ManagerName).HasMaxLength(100);
+            entity.Property(e => e.ManagerEmail).HasMaxLength(100);
+            entity.Property(e => e.GeographicLocation).HasMaxLength(100);
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.PreferredLanguage).HasMaxLength(10);
+            entity.Property(e => e.CompetenceAreas).HasMaxLength(2000);
+            entity.Property(e => e.TechnicalSkills).HasMaxLength(2000);
+            entity.Property(e => e.ContractNumber).HasMaxLength(50);
+            entity.Property(e => e.VendorId).HasMaxLength(50);
+            
+            entity.HasOne(e => e.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasOne(e => e.UpdatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.ActorType);
+            entity.HasIndex(e => e.OrganizationName);
+            entity.HasIndex(e => e.SecurityClearance);
+            entity.HasIndex(e => e.IsActive);
+        });
+        
+        // ActorRole many-to-many configuration
+        modelBuilder.Entity<ActorRole>(entity =>
+        {
+            entity.HasKey(e => new { e.ActorId, e.RoleId });
+            entity.HasOne(e => e.Actor)
+                .WithMany(e => e.ActorRoles)
+                .HasForeignKey(e => e.ActorId);
+            entity.HasOne(e => e.Role)
+                .WithMany()
+                .HasForeignKey(e => e.RoleId);
+            entity.HasOne(e => e.AssignedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.AssignedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.HasIndex(e => e.IsActive);
+        });
+        
+        // ActorNote configuration
+        modelBuilder.Entity<ActorNote>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Note).HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.Category).HasMaxLength(50);
+            
+            entity.HasOne(e => e.Actor)
+                .WithMany(e => e.Notes)
+                .HasForeignKey(e => e.ActorId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            entity.HasIndex(e => e.ActorId);
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.CreatedAt);
         });
         
         // Seed default roles
@@ -473,6 +557,9 @@ public class ProsessPortalDbContext : DbContext
         
         // Seed sample processes
         SeedSampleProsesses(modelBuilder);
+        
+        // Seed sample actors
+        SeedSampleActors(modelBuilder);
     }
     
     private void SeedSampleProsesses(ModelBuilder modelBuilder)
@@ -532,6 +619,97 @@ public class ProsessPortalDbContext : DbContext
                 CreatedByUserId = 1,
                 IsActive = true,
                 ViewCount = 8
+            }
+        );
+    }
+    
+    private void SeedSampleActors(ModelBuilder modelBuilder)
+    {
+        var baseDate = new DateTime(2025, 11, 23, 17, 0, 0, DateTimeKind.Utc);
+        
+        modelBuilder.Entity<Actor>().HasData(
+            new Actor 
+            {
+                Id = 1,
+                FirstName = "Lars",
+                LastName = "Johansen",
+                Email = "lars.johansen@forsvaret.no",
+                Phone = "+47 98765432",
+                ActorType = ActorType.Internal,
+                SecurityClearance = SecurityClearance.Secret,
+                OrganizationName = "Forsvaret",
+                Department = "IT-avdelingen",
+                Position = "IT-arkitekt",
+                GeographicLocation = "Oslo",
+                PreferredLanguage = "NO",
+                CompetenceAreas = "[\"IT-arkitektur\", \"Sikkerhet\", \"Systemintegrasjon\"]",
+                TechnicalSkills = "[\"Azure\", \"C#\", \".NET\", \"Docker\"]",
+                IsActive = true,
+                CreatedAt = baseDate.AddDays(-60),
+                CreatedByUserId = 1
+            },
+            new Actor 
+            {
+                Id = 2,
+                FirstName = "Kari",
+                LastName = "Andersen",
+                Email = "kari.andersen@forsvaret.no",
+                Phone = "+47 87654321",
+                ActorType = ActorType.Internal,
+                SecurityClearance = SecurityClearance.Confidential,
+                OrganizationName = "Forsvaret",
+                Department = "HR",
+                Position = "HR-spesialist",
+                GeographicLocation = "Bergen",
+                PreferredLanguage = "NO",
+                CompetenceAreas = "[\"HR-prosesser\", \"Rekruttering\", \"Personalhåndtering\"]",
+                IsActive = true,
+                CreatedAt = baseDate.AddDays(-45),
+                CreatedByUserId = 1
+            },
+            new Actor 
+            {
+                Id = 3,
+                FirstName = "John",
+                LastName = "Smith",
+                Email = "john.smith@techcorp.com",
+                Phone = "+47 76543210",
+                ActorType = ActorType.Vendor,
+                SecurityClearance = SecurityClearance.Restricted,
+                OrganizationName = "TechCorp AS",
+                Department = "Support",
+                Position = "Senior konsulent",
+                GeographicLocation = "Oslo",
+                PreferredLanguage = "EN",
+                CompetenceAreas = "[\"IT-support\", \"Systemadministrasjon\"]",
+                TechnicalSkills = "[\"Windows Server\", \"Active Directory\", \"Exchange\"]",
+                ContractNumber = "K-2025-001",
+                ContractStartDate = baseDate.AddDays(-90),
+                ContractEndDate = baseDate.AddDays(275),
+                VendorId = "TECH001",
+                IsActive = true,
+                CreatedAt = baseDate.AddDays(-90),
+                CreatedByUserId = 1
+            },
+            new Actor 
+            {
+                Id = 4,
+                FirstName = "Maria",
+                LastName = "Hansen",
+                Email = "maria.hansen@forsvaret.no",
+                Phone = "+47 65432109",
+                ActorType = ActorType.Internal,
+                SecurityClearance = SecurityClearance.TopSecret,
+                OrganizationName = "Forsvaret",
+                Department = "Sikkerhet",
+                Position = "Sikkerhetsspesialist",
+                GeographicLocation = "Trondheim",
+                PreferredLanguage = "NO",
+                CompetenceAreas = "[\"Informasjonssikkerhet\", \"Compliance\", \"Risikoanalyse\"]",
+                TechnicalSkills = "[\"ISO 27001\", \"Sikkerhetsvurderinger\", \"Penetrasjonstesting\"]",
+                IsActive = true,
+                CreatedAt = baseDate.AddDays(-30),
+                CreatedByUserId = 1
             }
         );
     }

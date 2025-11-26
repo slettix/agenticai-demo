@@ -91,6 +91,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("permission", "approve_prosess"));
     options.AddPolicy("RequireViewQA", policy => 
         policy.RequireClaim("permission", "view_qa_queue"));
+    options.AddPolicy("RequireAdminRole", policy => 
+        policy.RequireRole("Admin"));
 });
 
 // CORS
@@ -113,6 +115,7 @@ builder.Services.AddScoped<IProsessService, ProsessService>();
 builder.Services.AddScoped<IApprovalService, ApprovalService>();
 builder.Services.AddScoped<IEditingService, EditingService>();
 builder.Services.AddScoped<IDeletionService, DeletionService>();
+builder.Services.AddScoped<IActorService, ActorService>();
 
 // HTTP client for agent service
 builder.Services.AddHttpClient<IAgentService, AgentService>(client =>
