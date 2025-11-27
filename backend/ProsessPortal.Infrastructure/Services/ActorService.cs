@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 using ProsessPortal.Core.DTOs;
 using ProsessPortal.Core.Entities;
 using ProsessPortal.Core.Interfaces;
@@ -25,11 +24,17 @@ public class ActorService : IActorService
         {
             var searchLower = search.SearchTerm.ToLower();
             query = query.Where(a =>
-                a.FirstName.ToLower().Contains(searchLower) ||
-                a.LastName.ToLower().Contains(searchLower) ||
+                (a.FirstName != null && a.FirstName.ToLower().Contains(searchLower)) ||
+                (a.LastName != null && a.LastName.ToLower().Contains(searchLower)) ||
                 a.Email.ToLower().Contains(searchLower) ||
-                a.OrganizationName!.ToLower().Contains(searchLower) ||
-                a.Department!.ToLower().Contains(searchLower));
+                (a.OrganizationName != null && a.OrganizationName.ToLower().Contains(searchLower)) ||
+                (a.UnitName != null && a.UnitName.ToLower().Contains(searchLower)) ||
+                (a.Department != null && a.Department.ToLower().Contains(searchLower)));
+        }
+
+        if (search.ActorCategory.HasValue)
+        {
+            query = query.Where(a => a.ActorCategory == search.ActorCategory.Value);
         }
 
         if (search.ActorType.HasValue)
@@ -52,6 +57,11 @@ public class ActorService : IActorService
             query = query.Where(a => a.Department == search.Department);
         }
 
+        if (!string.IsNullOrWhiteSpace(search.UnitName))
+        {
+            query = query.Where(a => a.UnitName == search.UnitName);
+        }
+
         if (!string.IsNullOrWhiteSpace(search.GeographicLocation))
         {
             query = query.Where(a => a.GeographicLocation == search.GeographicLocation);
@@ -62,13 +72,6 @@ public class ActorService : IActorService
             query = query.Where(a => a.IsActive == search.IsActive.Value);
         }
 
-        if (search.CompetenceAreas?.Any() == true)
-        {
-            foreach (var competence in search.CompetenceAreas)
-            {
-                query = query.Where(a => a.CompetenceAreas!.Contains(competence));
-            }
-        }
 
         var totalCount = await query.CountAsync();
 
@@ -126,13 +129,17 @@ public class ActorService : IActorService
     {
         var actor = new Actor
         {
+            ActorCategory = createActor.ActorCategory,
             FirstName = createActor.FirstName,
             LastName = createActor.LastName,
+            OrganizationName = createActor.OrganizationName,
+            UnitName = createActor.UnitName,
+            UnitType = createActor.UnitType,
+            UnitCode = createActor.UnitCode,
             Email = createActor.Email,
             Phone = createActor.Phone,
             ActorType = createActor.ActorType,
             SecurityClearance = createActor.SecurityClearance,
-            OrganizationName = createActor.OrganizationName,
             Department = createActor.Department,
             Position = createActor.Position,
             ManagerName = createActor.ManagerName,
@@ -140,16 +147,16 @@ public class ActorService : IActorService
             GeographicLocation = createActor.GeographicLocation,
             Address = createActor.Address,
             PreferredLanguage = createActor.PreferredLanguage,
-            CompetenceAreas = createActor.CompetenceAreas?.Any() == true 
-                ? JsonSerializer.Serialize(createActor.CompetenceAreas) 
-                : null,
-            TechnicalSkills = createActor.TechnicalSkills?.Any() == true 
-                ? JsonSerializer.Serialize(createActor.TechnicalSkills) 
-                : null,
             ContractNumber = createActor.ContractNumber,
-            ContractStartDate = createActor.ContractStartDate,
-            ContractEndDate = createActor.ContractEndDate,
+            ContractStartDate = createActor.ContractStartDate?.ToUniversalTime(),
+            ContractEndDate = createActor.ContractEndDate?.ToUniversalTime(),
             VendorId = createActor.VendorId,
+            RegistrationNumber = createActor.RegistrationNumber,
+            ParentOrganization = createActor.ParentOrganization,
+            EmployeeCount = createActor.EmployeeCount,
+            CommandStructure = createActor.CommandStructure,
+            UnitMission = createActor.UnitMission,
+            PersonnelCount = createActor.PersonnelCount,
             CreatedByUserId = currentUserId,
             CreatedAt = DateTime.UtcNow,
             IsActive = true
@@ -167,13 +174,17 @@ public class ActorService : IActorService
         if (actor == null)
             throw new ArgumentException("Actor not found");
 
+        actor.ActorCategory = updateActor.ActorCategory;
         actor.FirstName = updateActor.FirstName;
         actor.LastName = updateActor.LastName;
+        actor.OrganizationName = updateActor.OrganizationName;
+        actor.UnitName = updateActor.UnitName;
+        actor.UnitType = updateActor.UnitType;
+        actor.UnitCode = updateActor.UnitCode;
         actor.Email = updateActor.Email;
         actor.Phone = updateActor.Phone;
         actor.ActorType = updateActor.ActorType;
         actor.SecurityClearance = updateActor.SecurityClearance;
-        actor.OrganizationName = updateActor.OrganizationName;
         actor.Department = updateActor.Department;
         actor.Position = updateActor.Position;
         actor.ManagerName = updateActor.ManagerName;
@@ -181,16 +192,16 @@ public class ActorService : IActorService
         actor.GeographicLocation = updateActor.GeographicLocation;
         actor.Address = updateActor.Address;
         actor.PreferredLanguage = updateActor.PreferredLanguage;
-        actor.CompetenceAreas = updateActor.CompetenceAreas?.Any() == true 
-            ? JsonSerializer.Serialize(updateActor.CompetenceAreas) 
-            : null;
-        actor.TechnicalSkills = updateActor.TechnicalSkills?.Any() == true 
-            ? JsonSerializer.Serialize(updateActor.TechnicalSkills) 
-            : null;
         actor.ContractNumber = updateActor.ContractNumber;
-        actor.ContractStartDate = updateActor.ContractStartDate;
-        actor.ContractEndDate = updateActor.ContractEndDate;
+        actor.ContractStartDate = updateActor.ContractStartDate?.ToUniversalTime();
+        actor.ContractEndDate = updateActor.ContractEndDate?.ToUniversalTime();
         actor.VendorId = updateActor.VendorId;
+        actor.RegistrationNumber = updateActor.RegistrationNumber;
+        actor.ParentOrganization = updateActor.ParentOrganization;
+        actor.EmployeeCount = updateActor.EmployeeCount;
+        actor.CommandStructure = updateActor.CommandStructure;
+        actor.UnitMission = updateActor.UnitMission;
+        actor.PersonnelCount = updateActor.PersonnelCount;
         actor.IsActive = updateActor.IsActive;
         actor.UpdatedByUserId = currentUserId;
         actor.UpdatedAt = DateTime.UtcNow;
@@ -406,65 +417,6 @@ public class ActorService : IActorService
             .ToListAsync();
     }
 
-    public async Task<List<string>> GetCompetenceAreasAsync()
-    {
-        var actors = await _context.Actors
-            .Where(a => !string.IsNullOrEmpty(a.CompetenceAreas) && a.IsActive)
-            .Select(a => a.CompetenceAreas!)
-            .ToListAsync();
-
-        var competences = new HashSet<string>();
-        foreach (var actorCompetences in actors)
-        {
-            try
-            {
-                var parsedCompetences = JsonSerializer.Deserialize<List<string>>(actorCompetences);
-                if (parsedCompetences != null)
-                {
-                    foreach (var competence in parsedCompetences)
-                    {
-                        competences.Add(competence);
-                    }
-                }
-            }
-            catch
-            {
-                // Ignore invalid JSON
-            }
-        }
-
-        return competences.OrderBy(c => c).ToList();
-    }
-
-    public async Task<List<string>> GetTechnicalSkillsAsync()
-    {
-        var actors = await _context.Actors
-            .Where(a => !string.IsNullOrEmpty(a.TechnicalSkills) && a.IsActive)
-            .Select(a => a.TechnicalSkills!)
-            .ToListAsync();
-
-        var skills = new HashSet<string>();
-        foreach (var actorSkills in actors)
-        {
-            try
-            {
-                var parsedSkills = JsonSerializer.Deserialize<List<string>>(actorSkills);
-                if (parsedSkills != null)
-                {
-                    foreach (var skill in parsedSkills)
-                    {
-                        skills.Add(skill);
-                    }
-                }
-            }
-            catch
-            {
-                // Ignore invalid JSON
-            }
-        }
-
-        return skills.OrderBy(s => s).ToList();
-    }
 
     // Statistics
     public async Task<Dictionary<ActorType, int>> GetActorTypeStatsAsync()
@@ -491,26 +443,6 @@ public class ActorService : IActorService
 
     private ActorDTO MapToDTO(Actor actor)
     {
-        List<string>? competenceAreas = null;
-        List<string>? technicalSkills = null;
-
-        if (!string.IsNullOrEmpty(actor.CompetenceAreas))
-        {
-            try
-            {
-                competenceAreas = JsonSerializer.Deserialize<List<string>>(actor.CompetenceAreas);
-            }
-            catch { }
-        }
-
-        if (!string.IsNullOrEmpty(actor.TechnicalSkills))
-        {
-            try
-            {
-                technicalSkills = JsonSerializer.Deserialize<List<string>>(actor.TechnicalSkills);
-            }
-            catch { }
-        }
 
         var assignedRoles = actor.ActorRoles?.Where(ar => ar.IsActive).Select(ar => new RoleAssignmentDTO
         {
@@ -538,6 +470,7 @@ public class ActorService : IActorService
         return new ActorDTO
         {
             Id = actor.Id,
+            ActorCategory = actor.ActorCategory,
             FirstName = actor.FirstName,
             LastName = actor.LastName,
             Email = actor.Email,
@@ -545,6 +478,9 @@ public class ActorService : IActorService
             ActorType = actor.ActorType,
             SecurityClearance = actor.SecurityClearance,
             OrganizationName = actor.OrganizationName,
+            UnitName = actor.UnitName,
+            UnitType = actor.UnitType,
+            UnitCode = actor.UnitCode,
             Department = actor.Department,
             Position = actor.Position,
             ManagerName = actor.ManagerName,
@@ -552,12 +488,16 @@ public class ActorService : IActorService
             GeographicLocation = actor.GeographicLocation,
             Address = actor.Address,
             PreferredLanguage = actor.PreferredLanguage,
-            CompetenceAreas = competenceAreas,
-            TechnicalSkills = technicalSkills,
             ContractNumber = actor.ContractNumber,
             ContractStartDate = actor.ContractStartDate,
             ContractEndDate = actor.ContractEndDate,
             VendorId = actor.VendorId,
+            RegistrationNumber = actor.RegistrationNumber,
+            ParentOrganization = actor.ParentOrganization,
+            EmployeeCount = actor.EmployeeCount,
+            CommandStructure = actor.CommandStructure,
+            UnitMission = actor.UnitMission,
+            PersonnelCount = actor.PersonnelCount,
             IsActive = actor.IsActive,
             CreatedAt = actor.CreatedAt,
             UpdatedAt = actor.UpdatedAt,

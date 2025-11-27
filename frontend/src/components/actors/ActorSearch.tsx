@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ActorSearch as ActorSearchType, ActorType, SecurityClearance, actorService } from '../../services/actorService.ts';
+import { ActorSearch as ActorSearchType, ActorCategory, ActorType, SecurityClearance, actorService } from '../../services/actorService.ts';
 
-export { ActorType, SecurityClearance };
+export { ActorCategory, ActorType, SecurityClearance };
 
 interface ActorSearchProps {
   onSearch: (searchCriteria: ActorSearchType) => void;
@@ -17,7 +17,6 @@ export const ActorSearch: React.FC<ActorSearchProps> = ({
   const [searchForm, setSearchForm] = useState<ActorSearchType>(currentCriteria);
   const [organizations, setOrganizations] = useState<string[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
-  const [competenceAreas, setCompetenceAreas] = useState<string[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
@@ -26,14 +25,12 @@ export const ActorSearch: React.FC<ActorSearchProps> = ({
 
   const loadFilterOptions = async () => {
     try {
-      const [orgs, depts, areas] = await Promise.all([
+      const [orgs, depts] = await Promise.all([
         actorService.getOrganizations(),
-        actorService.getDepartments(),
-        actorService.getCompetenceAreas()
+        actorService.getDepartments()
       ]);
       setOrganizations(orgs);
       setDepartments(depts);
-      setCompetenceAreas(areas);
     } catch (error) {
       console.error('Kunne ikke laste filteralternativer:', error);
     }
@@ -56,6 +53,15 @@ export const ActorSearch: React.FC<ActorSearchProps> = ({
     };
     setSearchForm(resetForm);
     onSearch(resetForm);
+  };
+
+  const getActorCategoryLabel = (category: ActorCategory): string => {
+    switch (category) {
+      case ActorCategory.Person: return 'Person';
+      case ActorCategory.Organization: return 'Organisasjon';
+      case ActorCategory.Unit: return 'Enhet';
+      default: return 'Ukjent';
+    }
   };
 
   const getActorTypeLabel = (type: ActorType): string => {
@@ -94,6 +100,21 @@ export const ActorSearch: React.FC<ActorSearchProps> = ({
             />
           </div>
           
+          <div className="search-field">
+            <select
+              value={searchForm.actorCategory ?? ''}
+              onChange={(e) => handleInputChange('actorCategory', e.target.value ? Number(e.target.value) : undefined)}
+              className="search-select"
+            >
+              <option value="">Alle kategorier</option>
+              {Object.values(ActorCategory).filter(value => typeof value === 'number').map(category => (
+                <option key={category} value={category}>
+                  {getActorCategoryLabel(category as ActorCategory)}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="search-field">
             <select
               value={searchForm.actorType ?? ''}
@@ -169,6 +190,17 @@ export const ActorSearch: React.FC<ActorSearchProps> = ({
               </div>
 
               <div className="search-field">
+                <label>Enhet:</label>
+                <input
+                  type="text"
+                  placeholder="F.eks. Cyber Brigade, 2. Bataljon..."
+                  value={searchForm.unitName || ''}
+                  onChange={(e) => handleInputChange('unitName', e.target.value || undefined)}
+                  className="search-input"
+                />
+              </div>
+
+              <div className="search-field">
                 <label>Avdeling:</label>
                 <select
                   value={searchForm.department || ''}
@@ -194,29 +226,6 @@ export const ActorSearch: React.FC<ActorSearchProps> = ({
               </div>
             </div>
 
-            <div className="search-row">
-              <div className="search-field full-width">
-                <label>Kompetanseområder (velg flere):</label>
-                <div className="competence-tags">
-                  {competenceAreas.map(area => (
-                    <label key={area} className="competence-tag">
-                      <input
-                        type="checkbox"
-                        checked={searchForm.competenceAreas?.includes(area) || false}
-                        onChange={(e) => {
-                          const currentAreas = searchForm.competenceAreas || [];
-                          const newAreas = e.target.checked
-                            ? [...currentAreas, area]
-                            : currentAreas.filter(a => a !== area);
-                          handleInputChange('competenceAreas', newAreas.length > 0 ? newAreas : undefined);
-                        }}
-                      />
-                      {area}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
 
             <div className="advanced-actions">
               <button type="button" className="btn btn-link" onClick={handleReset}>

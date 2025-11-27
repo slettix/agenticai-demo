@@ -11,10 +11,12 @@ import { ProsessEditor } from './components/prosess/ProsessEditor.tsx';
 import { ApprovalQueue } from './components/approval/ApprovalQueue.tsx';
 import { DeletedProcessesList } from './components/deletion/DeletedProcessesList.tsx';
 import { ActorManagement } from './components/actors/ActorManagement.tsx';
+import { RoleManagement } from './components/roles/RoleManagement.tsx';
 import { ForsvaretLogo } from './components/common/ForsvaretLogo.tsx';
 import './components/auth/auth.css';
 import './components/prosess/prosess.css';
 import './components/actors/actors.css';
+import './components/roles/roles.css';
 import './App.css';
 
 // Navigation Component
@@ -43,7 +45,11 @@ const Navigation: React.FC = () => {
         </ProtectedRoute>
         
         <ProtectedRoute requiredRole="Admin">
-          <li><Link to="/aktorer">👥 Aktører og Roller</Link></li>
+          <li><Link to="/aktorer">👥 Aktører</Link></li>
+        </ProtectedRoute>
+        
+        <ProtectedRoute requiredPermission="manage_roles">
+          <li><Link to="/roller">🛡️ Roller og Tilganger</Link></li>
         </ProtectedRoute>
         
         <ProtectedRoute requiredRole="Admin">
@@ -140,6 +146,14 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute requiredRole="Admin">
                   <ActorManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/roller" 
+              element={
+                <ProtectedRoute requiredPermission="manage_roles">
+                  <RoleManagement />
                 </ProtectedRoute>
               } 
             />

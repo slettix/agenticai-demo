@@ -1,6 +1,8 @@
 import { LoginRequest, LoginResponse, RegisterRequest, User } from '../types/auth.ts';
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+console.log('AuthService: API_BASE_URL loaded as:', API_BASE_URL);
+console.log('AuthService: process.env.REACT_APP_API_URL is:', process.env.REACT_APP_API_URL);
 
 class AuthService {
   private tokenKey = 'prosessportal_token';
@@ -9,7 +11,11 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const url = `${API_BASE_URL}/api/auth/login`;
+      console.log('AuthService: Attempting login to', url);
+      console.log('AuthService: API_BASE_URL is', API_BASE_URL);
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -17,8 +23,12 @@ class AuthService {
         body: JSON.stringify(credentials),
       });
 
+      console.log('AuthService: Login response status', response.status);
+
       if (!response.ok) {
-        throw new Error('Login failed');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('AuthService: Login error', errorData);
+        throw new Error(errorData.error || 'Login failed');
       }
 
       const loginResponse: LoginResponse = await response.json();
@@ -27,14 +37,17 @@ class AuthService {
       
       return loginResponse;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('AuthService: Login catch error:', error);
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        console.error('AuthService: Network error - cannot reach server');
+      }
       return null;
     }
   }
 
   async register(userData: RegisterRequest): Promise<User | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +72,7 @@ class AuthService {
       const token = this.getToken();
       if (!token) return null;
 
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

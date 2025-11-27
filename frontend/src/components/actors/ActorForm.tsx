@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Actor, CreateActor, UpdateActor, ActorType, SecurityClearance, actorService } from '../../services/actorService.ts';
+import { Actor, CreateActor, UpdateActor, ActorCategory, ActorType, SecurityClearance, actorService } from '../../services/actorService.ts';
 
 interface ActorFormProps {
   actor?: Actor; // If provided, this is an edit form
@@ -17,13 +17,17 @@ export const ActorForm: React.FC<ActorFormProps> = ({
   isEdit = false
 }) => {
   const [formData, setFormData] = useState<CreateActor | UpdateActor>({
+    actorCategory: ActorCategory.Person,
     firstName: '',
     lastName: '',
+    organizationName: '',
+    unitName: '',
+    unitType: '',
+    unitCode: '',
     email: '',
     phone: '',
     actorType: ActorType.Internal,
     securityClearance: SecurityClearance.None,
-    organizationName: '',
     department: '',
     position: '',
     managerName: '',
@@ -31,22 +35,21 @@ export const ActorForm: React.FC<ActorFormProps> = ({
     geographicLocation: '',
     address: '',
     preferredLanguage: 'NO',
-    competenceAreas: [],
-    technicalSkills: [],
     contractNumber: '',
     contractStartDate: '',
     contractEndDate: '',
     vendorId: '',
+    registrationNumber: '',
+    parentOrganization: '',
+    employeeCount: undefined,
+    commandStructure: '',
+    unitMission: '',
+    personnelCount: undefined,
     ...(isEdit && { isActive: true })
   });
 
-  const [availableCompetences, setAvailableCompetences] = useState<string[]>([]);
-  const [availableSkills, setAvailableSkills] = useState<string[]>([]);
   const [availableOrganizations, setAvailableOrganizations] = useState<string[]>([]);
   const [availableDepartments, setAvailableDepartments] = useState<string[]>([]);
-
-  const [newCompetence, setNewCompetence] = useState('');
-  const [newSkill, setNewSkill] = useState('');
 
   useEffect(() => {
     loadOptions();
@@ -55,13 +58,17 @@ export const ActorForm: React.FC<ActorFormProps> = ({
   useEffect(() => {
     if (actor) {
       setFormData({
-        firstName: actor.firstName,
-        lastName: actor.lastName,
+        actorCategory: actor.actorCategory,
+        firstName: actor.firstName || '',
+        lastName: actor.lastName || '',
+        organizationName: actor.organizationName || '',
+        unitName: actor.unitName || '',
+        unitType: actor.unitType || '',
+        unitCode: actor.unitCode || '',
         email: actor.email,
         phone: actor.phone || '',
         actorType: actor.actorType,
         securityClearance: actor.securityClearance,
-        organizationName: actor.organizationName || '',
         department: actor.department || '',
         position: actor.position || '',
         managerName: actor.managerName || '',
@@ -69,12 +76,16 @@ export const ActorForm: React.FC<ActorFormProps> = ({
         geographicLocation: actor.geographicLocation || '',
         address: actor.address || '',
         preferredLanguage: actor.preferredLanguage || 'NO',
-        competenceAreas: actor.competenceAreas || [],
-        technicalSkills: actor.technicalSkills || [],
         contractNumber: actor.contractNumber || '',
         contractStartDate: actor.contractStartDate ? actor.contractStartDate.split('T')[0] : '',
         contractEndDate: actor.contractEndDate ? actor.contractEndDate.split('T')[0] : '',
         vendorId: actor.vendorId || '',
+        registrationNumber: actor.registrationNumber || '',
+        parentOrganization: actor.parentOrganization || '',
+        employeeCount: actor.employeeCount,
+        commandStructure: actor.commandStructure || '',
+        unitMission: actor.unitMission || '',
+        personnelCount: actor.personnelCount,
         ...(isEdit && { isActive: actor.isActive })
       });
     }
@@ -82,14 +93,10 @@ export const ActorForm: React.FC<ActorFormProps> = ({
 
   const loadOptions = async () => {
     try {
-      const [competences, skills, organizations, departments] = await Promise.all([
-        actorService.getCompetenceAreas(),
-        actorService.getTechnicalSkills(),
+      const [organizations, departments] = await Promise.all([
         actorService.getOrganizations(),
         actorService.getDepartments()
       ]);
-      setAvailableCompetences(competences);
-      setAvailableSkills(skills);
       setAvailableOrganizations(organizations);
       setAvailableDepartments(departments);
     } catch (error) {
@@ -106,32 +113,6 @@ export const ActorForm: React.FC<ActorFormProps> = ({
     onSubmit(formData);
   };
 
-  const addCompetence = () => {
-    if (newCompetence.trim() && !formData.competenceAreas?.includes(newCompetence.trim())) {
-      const updatedCompetences = [...(formData.competenceAreas || []), newCompetence.trim()];
-      handleInputChange('competenceAreas', updatedCompetences);
-      setNewCompetence('');
-    }
-  };
-
-  const removeCompetence = (competence: string) => {
-    const updatedCompetences = formData.competenceAreas?.filter(c => c !== competence) || [];
-    handleInputChange('competenceAreas', updatedCompetences);
-  };
-
-  const addSkill = () => {
-    if (newSkill.trim() && !formData.technicalSkills?.includes(newSkill.trim())) {
-      const updatedSkills = [...(formData.technicalSkills || []), newSkill.trim()];
-      handleInputChange('technicalSkills', updatedSkills);
-      setNewSkill('');
-    }
-  };
-
-  const removeSkill = (skill: string) => {
-    const updatedSkills = formData.technicalSkills?.filter(s => s !== skill) || [];
-    handleInputChange('technicalSkills', updatedSkills);
-  };
-
   const isExternal = formData.actorType !== ActorType.Internal;
 
   return (
@@ -144,29 +125,141 @@ export const ActorForm: React.FC<ActorFormProps> = ({
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="firstName">Fornavn *</label>
-              <input
-                id="firstName"
-                type="text"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange('firstName', e.target.value)}
+              <label htmlFor="actorCategory">Aktørkategori *</label>
+              <select
+                id="actorCategory"
+                value={formData.actorCategory}
+                onChange={(e) => handleInputChange('actorCategory', Number(e.target.value))}
                 required
-                className="form-input"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="lastName">Etternavn *</label>
-              <input
-                id="lastName"
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                required
-                className="form-input"
-              />
+                className="form-select"
+              >
+                <option value={ActorCategory.Person}>Person</option>
+                <option value={ActorCategory.Organization}>Organisasjon</option>
+                <option value={ActorCategory.Unit}>Enhet</option>
+              </select>
             </div>
           </div>
+
+          {formData.actorCategory === ActorCategory.Person && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="firstName">Fornavn *</label>
+                <input
+                  id="firstName"
+                  type="text"
+                  value={formData.firstName || ''}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  required
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="lastName">Etternavn *</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  value={formData.lastName || ''}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  required
+                  className="form-input"
+                />
+              </div>
+            </div>
+          )}
+
+          {formData.actorCategory === ActorCategory.Organization && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="organizationName">Organisasjonsnavn *</label>
+                <input
+                  id="organizationName"
+                  type="text"
+                  value={formData.organizationName || ''}
+                  onChange={(e) => handleInputChange('organizationName', e.target.value)}
+                  required
+                  className="form-input"
+                  placeholder="F.eks. TechCorp AS"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="registrationNumber">Organisasjonsnummer</label>
+                <input
+                  id="registrationNumber"
+                  type="text"
+                  value={formData.registrationNumber || ''}
+                  onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
+                  className="form-input"
+                  placeholder="123456789"
+                />
+              </div>
+            </div>
+          )}
+
+          {formData.actorCategory === ActorCategory.Unit && (
+            <>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="unitName">Enhetsnavn *</label>
+                  <input
+                    id="unitName"
+                    type="text"
+                    value={formData.unitName || ''}
+                    onChange={(e) => handleInputChange('unitName', e.target.value)}
+                    required
+                    className="form-input"
+                    placeholder="F.eks. Cyber Brigade"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="unitCode">Enhetskode</label>
+                  <input
+                    id="unitCode"
+                    type="text"
+                    value={formData.unitCode || ''}
+                    onChange={(e) => handleInputChange('unitCode', e.target.value)}
+                    className="form-input"
+                    placeholder="F.eks. CYB-BDE"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="unitType">Enhetstype</label>
+                  <select
+                    id="unitType"
+                    value={formData.unitType || ''}
+                    onChange={(e) => handleInputChange('unitType', e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="">Velg enhetstype</option>
+                    <option value="Brigade">Brigade</option>
+                    <option value="Bataljon">Bataljon</option>
+                    <option value="Kompani">Kompani</option>
+                    <option value="Tropp">Tropp</option>
+                    <option value="Gruppe">Gruppe</option>
+                    <option value="Avdeling">Avdeling</option>
+                    <option value="Seksjon">Seksjon</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="commandStructure">Kommandostruktur</label>
+                  <input
+                    id="commandStructure"
+                    type="text"
+                    value={formData.commandStructure || ''}
+                    onChange={(e) => handleInputChange('commandStructure', e.target.value)}
+                    className="form-input"
+                    placeholder="F.eks. Hærstaben"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="form-row">
             <div className="form-group">
@@ -246,63 +339,133 @@ export const ActorForm: React.FC<ActorFormProps> = ({
         </div>
 
         <div className="form-section">
-          <h3>Organisasjon og rolle</h3>
+          <h3>
+            {formData.actorCategory === ActorCategory.Organization && 'Organisasjonsdetaljer'}
+            {formData.actorCategory === ActorCategory.Unit && 'Enhetsdetaljer'}
+            {formData.actorCategory === ActorCategory.Person && 'Organisasjon og rolle'}
+          </h3>
           
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="organizationName">Organisasjon</label>
-              <input
-                id="organizationName"
-                type="text"
-                value={formData.organizationName}
-                onChange={(e) => handleInputChange('organizationName', e.target.value)}
-                className="form-input"
-                list="organizations"
-                placeholder={isExternal ? "F.eks. TechCorp AS" : "Forsvaret"}
-              />
-              <datalist id="organizations">
-                {availableOrganizations.map(org => (
-                  <option key={org} value={org} />
-                ))}
-              </datalist>
-            </div>
+          {formData.actorCategory === ActorCategory.Person && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="organizationName">Organisasjon</label>
+                <input
+                  id="organizationName"
+                  type="text"
+                  value={formData.organizationName || ''}
+                  onChange={(e) => handleInputChange('organizationName', e.target.value)}
+                  className="form-input"
+                  list="organizations"
+                  placeholder={isExternal ? "F.eks. TechCorp AS" : "Forsvaret"}
+                />
+                <datalist id="organizations">
+                  {availableOrganizations.map(org => (
+                    <option key={org} value={org} />
+                  ))}
+                </datalist>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="department">Avdeling</label>
-              <input
-                id="department"
-                type="text"
-                value={formData.department}
-                onChange={(e) => handleInputChange('department', e.target.value)}
-                className="form-input"
-                list="departments"
-              />
-              <datalist id="departments">
-                {availableDepartments.map(dept => (
-                  <option key={dept} value={dept} />
-                ))}
-              </datalist>
+              <div className="form-group">
+                <label htmlFor="department">Avdeling</label>
+                <input
+                  id="department"
+                  type="text"
+                  value={formData.department || ''}
+                  onChange={(e) => handleInputChange('department', e.target.value)}
+                  className="form-input"
+                  list="departments"
+                />
+                <datalist id="departments">
+                  {availableDepartments.map(dept => (
+                    <option key={dept} value={dept} />
+                  ))}
+                </datalist>
+              </div>
             </div>
-          </div>
+          )}
+
+          {formData.actorCategory === ActorCategory.Organization && (
+            <>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="parentOrganization">Moderorganisasjon</label>
+                  <input
+                    id="parentOrganization"
+                    type="text"
+                    value={formData.parentOrganization || ''}
+                    onChange={(e) => handleInputChange('parentOrganization', e.target.value)}
+                    className="form-input"
+                    placeholder="F.eks. TechCorp International"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="employeeCount">Antall ansatte</label>
+                  <input
+                    id="employeeCount"
+                    type="number"
+                    min="1"
+                    value={formData.employeeCount || ''}
+                    onChange={(e) => handleInputChange('employeeCount', e.target.value ? parseInt(e.target.value) : undefined)}
+                    className="form-input"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {formData.actorCategory === ActorCategory.Unit && (
+            <>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="unitMission">Enhetsoppdrag</label>
+                  <textarea
+                    id="unitMission"
+                    value={formData.unitMission || ''}
+                    onChange={(e) => handleInputChange('unitMission', e.target.value)}
+                    className="form-textarea"
+                    rows={3}
+                    placeholder="Beskriv enhetens hovedoppdrag og ansvar..."
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="personnelCount">Personalstyrke</label>
+                  <input
+                    id="personnelCount"
+                    type="number"
+                    min="1"
+                    value={formData.personnelCount || ''}
+                    onChange={(e) => handleInputChange('personnelCount', e.target.value ? parseInt(e.target.value) : undefined)}
+                    className="form-input"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="position">Stilling</label>
-              <input
-                id="position"
-                type="text"
-                value={formData.position}
-                onChange={(e) => handleInputChange('position', e.target.value)}
-                className="form-input"
-              />
-            </div>
+            {formData.actorCategory === ActorCategory.Person && (
+              <div className="form-group">
+                <label htmlFor="position">Stilling</label>
+                <input
+                  id="position"
+                  type="text"
+                  value={formData.position || ''}
+                  onChange={(e) => handleInputChange('position', e.target.value)}
+                  className="form-input"
+                />
+              </div>
+            )}
 
             <div className="form-group">
               <label htmlFor="geographicLocation">Geografisk lokasjon</label>
               <input
                 id="geographicLocation"
                 type="text"
-                value={formData.geographicLocation}
+                value={formData.geographicLocation || ''}
                 onChange={(e) => handleInputChange('geographicLocation', e.target.value)}
                 className="form-input"
                 placeholder="F.eks. Oslo, Bergen, Trondheim"
@@ -310,29 +473,52 @@ export const ActorForm: React.FC<ActorFormProps> = ({
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="managerName">Leder</label>
-              <input
-                id="managerName"
-                type="text"
-                value={formData.managerName}
-                onChange={(e) => handleInputChange('managerName', e.target.value)}
-                className="form-input"
-              />
-            </div>
+          {formData.actorCategory === ActorCategory.Person && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="managerName">Leder</label>
+                <input
+                  id="managerName"
+                  type="text"
+                  value={formData.managerName || ''}
+                  onChange={(e) => handleInputChange('managerName', e.target.value)}
+                  className="form-input"
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="managerEmail">Leder e-post</label>
-              <input
-                id="managerEmail"
-                type="email"
-                value={formData.managerEmail}
-                onChange={(e) => handleInputChange('managerEmail', e.target.value)}
-                className="form-input"
-              />
+              <div className="form-group">
+                <label htmlFor="managerEmail">Leder e-post</label>
+                <input
+                  id="managerEmail"
+                  type="email"
+                  value={formData.managerEmail || ''}
+                  onChange={(e) => handleInputChange('managerEmail', e.target.value)}
+                  className="form-input"
+                />
+              </div>
             </div>
-          </div>
+          )}
+
+          {formData.actorCategory !== ActorCategory.Person && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="department">Avdeling/Underenhet</label>
+                <input
+                  id="department"
+                  type="text"
+                  value={formData.department || ''}
+                  onChange={(e) => handleInputChange('department', e.target.value)}
+                  className="form-input"
+                  list="departments"
+                />
+                <datalist id="departments">
+                  {availableDepartments.map(dept => (
+                    <option key={dept} value={dept} />
+                  ))}
+                </datalist>
+              </div>
+            </div>
+          )}
         </div>
 
         {isExternal && (
@@ -390,75 +576,7 @@ export const ActorForm: React.FC<ActorFormProps> = ({
         )}
 
         <div className="form-section">
-          <h3>Kompetanse og ferdigheter</h3>
-          
-          <div className="form-group">
-            <label>Kompetanseområder</label>
-            <div className="tag-input">
-              <div className="add-tag">
-                <input
-                  type="text"
-                  value={newCompetence}
-                  onChange={(e) => setNewCompetence(e.target.value)}
-                  placeholder="Legg til kompetanseområde"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCompetence())}
-                  list="available-competences"
-                />
-                <datalist id="available-competences">
-                  {availableCompetences.map(comp => (
-                    <option key={comp} value={comp} />
-                  ))}
-                </datalist>
-                <button type="button" onClick={addCompetence} className="btn btn-sm btn-primary">
-                  Legg til
-                </button>
-              </div>
-              <div className="tags">
-                {formData.competenceAreas?.map(competence => (
-                  <span key={competence} className="tag">
-                    {competence}
-                    <button type="button" onClick={() => removeCompetence(competence)} className="tag-remove">
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Tekniske ferdigheter</label>
-            <div className="tag-input">
-              <div className="add-tag">
-                <input
-                  type="text"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  placeholder="Legg til teknisk ferdighet"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                  list="available-skills"
-                />
-                <datalist id="available-skills">
-                  {availableSkills.map(skill => (
-                    <option key={skill} value={skill} />
-                  ))}
-                </datalist>
-                <button type="button" onClick={addSkill} className="btn btn-sm btn-primary">
-                  Legg til
-                </button>
-              </div>
-              <div className="tags">
-                {formData.technicalSkills?.map(skill => (
-                  <span key={skill} className="tag">
-                    {skill}
-                    <button type="button" onClick={() => removeSkill(skill)} className="tag-remove">
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+          <h3>Språk og kontakt</h3>
 
           <div className="form-group">
             <label htmlFor="preferredLanguage">Foretrukket språk</label>

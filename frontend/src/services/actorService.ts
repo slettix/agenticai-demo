@@ -1,4 +1,10 @@
 // Actor Types
+export enum ActorCategory {
+  Person = 0,
+  Organization = 1,
+  Unit = 2
+}
+
 export enum ActorType {
   Internal = 0,
   External = 1,
@@ -17,13 +23,23 @@ export enum SecurityClearance {
 
 export interface Actor {
   id: number;
-  firstName: string;
-  lastName: string;
+  actorCategory: ActorCategory;
+  
+  // Personal information (for Person category)
+  firstName?: string;
+  lastName?: string;
+  
+  // Organization/Unit information
+  organizationName?: string;
+  unitName?: string;
+  unitType?: string;
+  unitCode?: string;
+  
+  // Common fields
   email: string;
   phone?: string;
   actorType: ActorType;
   securityClearance: SecurityClearance;
-  organizationName?: string;
   department?: string;
   position?: string;
   managerName?: string;
@@ -31,30 +47,49 @@ export interface Actor {
   geographicLocation?: string;
   address?: string;
   preferredLanguage?: string;
-  competenceAreas?: string[];
-  technicalSkills?: string[];
   contractNumber?: string;
   contractStartDate?: string;
   contractEndDate?: string;
   vendorId?: string;
+  
+  // Organization-specific fields
+  registrationNumber?: string;
+  parentOrganization?: string;
+  employeeCount?: number;
+  
+  // Unit-specific fields
+  commandStructure?: string;
+  unitMission?: string;
+  personnelCount?: number;
+  
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;
   createdByUserName: string;
   updatedByUserName?: string;
-  fullName: string;
+  displayName: string;
   assignedRoles?: RoleAssignment[];
   notes?: ActorNote[];
 }
 
 export interface CreateActor {
-  firstName: string;
-  lastName: string;
+  actorCategory: ActorCategory;
+  
+  // Personal information (required for Person category)
+  firstName?: string;
+  lastName?: string;
+  
+  // Organization/Unit information
+  organizationName?: string;
+  unitName?: string;
+  unitType?: string;
+  unitCode?: string;
+  
+  // Common fields
   email: string;
   phone?: string;
   actorType: ActorType;
   securityClearance: SecurityClearance;
-  organizationName?: string;
   department?: string;
   position?: string;
   managerName?: string;
@@ -62,22 +97,40 @@ export interface CreateActor {
   geographicLocation?: string;
   address?: string;
   preferredLanguage?: string;
-  competenceAreas?: string[];
-  technicalSkills?: string[];
   contractNumber?: string;
   contractStartDate?: string;
   contractEndDate?: string;
   vendorId?: string;
+  
+  // Organization-specific fields
+  registrationNumber?: string;
+  parentOrganization?: string;
+  employeeCount?: number;
+  
+  // Unit-specific fields
+  commandStructure?: string;
+  unitMission?: string;
+  personnelCount?: number;
 }
 
 export interface UpdateActor {
-  firstName: string;
-  lastName: string;
+  actorCategory: ActorCategory;
+  
+  // Personal information
+  firstName?: string;
+  lastName?: string;
+  
+  // Organization/Unit information
+  organizationName?: string;
+  unitName?: string;
+  unitType?: string;
+  unitCode?: string;
+  
+  // Common fields
   email: string;
   phone?: string;
   actorType: ActorType;
   securityClearance: SecurityClearance;
-  organizationName?: string;
   department?: string;
   position?: string;
   managerName?: string;
@@ -85,24 +138,34 @@ export interface UpdateActor {
   geographicLocation?: string;
   address?: string;
   preferredLanguage?: string;
-  competenceAreas?: string[];
-  technicalSkills?: string[];
   contractNumber?: string;
   contractStartDate?: string;
   contractEndDate?: string;
   vendorId?: string;
+  
+  // Organization-specific fields
+  registrationNumber?: string;
+  parentOrganization?: string;
+  employeeCount?: number;
+  
+  // Unit-specific fields
+  commandStructure?: string;
+  unitMission?: string;
+  personnelCount?: number;
+  
   isActive: boolean;
 }
 
 export interface ActorSearch {
   searchTerm?: string;
+  actorCategory?: ActorCategory;
   actorType?: ActorType;
   securityClearance?: SecurityClearance;
   organizationName?: string;
+  unitName?: string;
   department?: string;
   geographicLocation?: string;
   isActive?: boolean;
-  competenceAreas?: string[];
   page?: number;
   pageSize?: number;
 }
@@ -149,7 +212,7 @@ export interface CreateActorNote {
   isPrivate?: boolean;
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 class ActorService {
   private async getAuthToken(): Promise<string> {
@@ -164,23 +227,41 @@ class ActorService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const token = await this.getAuthToken();
-    
-    const response = await fetch(`${API_BASE_URL}/api/actor${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers,
-      },
-    });
+    try {
+      const token = await this.getAuthToken();
+      
+      const url = `${API_BASE_URL}/api/actor${endpoint}`;
+      console.log('ActorService: Making request to', url);
+      
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          ...options.headers,
+        },
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      console.log('ActorService: Response status', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      // Handle DELETE responses that return 204 No Content
+      if (response.status === 204 || !response.headers.get('content-type')?.includes('application/json')) {
+        return undefined as unknown as T;
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('ActorService: Request failed', error);
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        throw new Error('Kan ikke nå serveren. Sjekk at backend kjører på http://localhost:5001');
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   // Actor CRUD operations
@@ -188,9 +269,11 @@ class ActorService {
     const params = new URLSearchParams();
     
     if (search.searchTerm) params.append('searchTerm', search.searchTerm);
+    if (search.actorCategory !== undefined) params.append('actorCategory', search.actorCategory.toString());
     if (search.actorType !== undefined) params.append('actorType', search.actorType.toString());
     if (search.securityClearance !== undefined) params.append('securityClearance', search.securityClearance.toString());
     if (search.organizationName) params.append('organizationName', search.organizationName);
+    if (search.unitName) params.append('unitName', search.unitName);
     if (search.department) params.append('department', search.department);
     if (search.geographicLocation) params.append('geographicLocation', search.geographicLocation);
     if (search.isActive !== undefined) params.append('isActive', search.isActive.toString());
@@ -293,14 +376,6 @@ class ActorService {
 
   async getDepartments(): Promise<string[]> {
     return this.makeRequest<string[]>('/departments');
-  }
-
-  async getCompetenceAreas(): Promise<string[]> {
-    return this.makeRequest<string[]>('/competence-areas');
-  }
-
-  async getTechnicalSkills(): Promise<string[]> {
-    return this.makeRequest<string[]>('/technical-skills');
   }
 
   // Statistics

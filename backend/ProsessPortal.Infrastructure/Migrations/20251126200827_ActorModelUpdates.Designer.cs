@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProsessPortal.Infrastructure.Data;
@@ -11,9 +12,11 @@ using ProsessPortal.Infrastructure.Data;
 namespace ProsessPortal.Infrastructure.Migrations
 {
     [DbContext(typeof(ProsessPortalDbContext))]
-    partial class ProsessPortalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251126200827_ActorModelUpdates")]
+    partial class ActorModelUpdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -349,9 +352,6 @@ namespace ProsessPortal.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<int?>("RoleId1")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("ValidFrom")
                         .HasColumnType("timestamp with time zone");
 
@@ -365,8 +365,6 @@ namespace ProsessPortal.Infrastructure.Migrations
                     b.HasIndex("IsActive");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("RoleId1");
 
                     b.ToTable("ActorRoles");
                 });
@@ -1185,45 +1183,23 @@ namespace ProsessPortal.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("CreatedByUserId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("UpdatedByUserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("Name")
                         .IsUnique();
-
-                    b.HasIndex("UpdatedByUserId");
 
                     b.ToTable("Roles");
 
@@ -1231,56 +1207,36 @@ namespace ProsessPortal.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Category = 0,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedByUserId = 0,
+                            CreatedAt = new DateTime(2025, 11, 26, 20, 8, 27, 371, DateTimeKind.Utc).AddTicks(5640),
                             Description = "Systemadministrator med full tilgang",
-                            IsActive = true,
-                            Level = 0,
                             Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            Category = 0,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedByUserId = 0,
+                            CreatedAt = new DateTime(2025, 11, 26, 20, 8, 27, 371, DateTimeKind.Utc).AddTicks(6000),
                             Description = "Eier av prosesser, kan redigere og godkjenne",
-                            IsActive = true,
-                            Level = 0,
                             Name = "ProsessEier"
                         },
                         new
                         {
                             Id = 3,
-                            Category = 0,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedByUserId = 0,
+                            CreatedAt = new DateTime(2025, 11, 26, 20, 8, 27, 371, DateTimeKind.Utc).AddTicks(6000),
                             Description = "Kvalitetssikring, kan godkjenne endringer",
-                            IsActive = true,
-                            Level = 0,
                             Name = "QA"
                         },
                         new
                         {
                             Id = 4,
-                            Category = 0,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedByUserId = 0,
+                            CreatedAt = new DateTime(2025, 11, 26, 20, 8, 27, 371, DateTimeKind.Utc).AddTicks(6000),
                             Description = "Fagekspert, kan foreslå endringer",
-                            IsActive = true,
-                            Level = 0,
                             Name = "SME"
                         },
                         new
                         {
                             Id = 5,
-                            Category = 0,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedByUserId = 0,
+                            CreatedAt = new DateTime(2025, 11, 26, 20, 8, 27, 371, DateTimeKind.Utc).AddTicks(6000),
                             Description = "Vanlig bruker, kun lesetilgang",
-                            IsActive = true,
-                            Level = 0,
                             Name = "Bruker"
                         });
                 });
@@ -1593,10 +1549,6 @@ namespace ProsessPortal.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProsessPortal.Core.Entities.Role", null)
-                        .WithMany("ActorRoles")
-                        .HasForeignKey("RoleId1");
-
                     b.Navigation("Actor");
 
                     b.Navigation("AssignedByUser");
@@ -1846,23 +1798,6 @@ namespace ProsessPortal.Infrastructure.Migrations
                     b.Navigation("PublishedByUser");
                 });
 
-            modelBuilder.Entity("ProsessPortal.Core.Entities.Role", b =>
-                {
-                    b.HasOne("ProsessPortal.Core.Entities.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProsessPortal.Core.Entities.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId");
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("UpdatedByUser");
-                });
-
             modelBuilder.Entity("ProsessPortal.Core.Entities.RolePermission", b =>
                 {
                     b.HasOne("ProsessPortal.Core.Entities.Permission", "Permission")
@@ -1957,8 +1892,6 @@ namespace ProsessPortal.Infrastructure.Migrations
 
             modelBuilder.Entity("ProsessPortal.Core.Entities.Role", b =>
                 {
-                    b.Navigation("ActorRoles");
-
                     b.Navigation("RolePermissions");
 
                     b.Navigation("UserRoles");

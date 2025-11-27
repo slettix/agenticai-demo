@@ -14,7 +14,7 @@ import {
 import { ProsessDetail } from '../types/prosess';
 import { authService } from './authService.ts';
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:5001') + '/api';
 
 class EditingService {
   private autoSaveInterval: number | null = null;

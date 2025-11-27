@@ -340,33 +340,6 @@ public class ActorController : ControllerBase
         }
     }
 
-    [HttpGet("competence-areas")]
-    public async Task<ActionResult<List<string>>> GetCompetenceAreas()
-    {
-        try
-        {
-            var competenceAreas = await _actorService.GetCompetenceAreasAsync();
-            return Ok(competenceAreas);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { error = "Failed to retrieve competence areas", details = ex.Message });
-        }
-    }
-
-    [HttpGet("technical-skills")]
-    public async Task<ActionResult<List<string>>> GetTechnicalSkills()
-    {
-        try
-        {
-            var technicalSkills = await _actorService.GetTechnicalSkillsAsync();
-            return Ok(technicalSkills);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { error = "Failed to retrieve technical skills", details = ex.Message });
-        }
-    }
 
     // Statistics endpoints
     [HttpGet("stats/actor-types")]

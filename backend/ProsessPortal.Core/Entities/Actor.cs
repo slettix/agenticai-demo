@@ -1,8 +1,15 @@
 namespace ProsessPortal.Core.Entities;
 
+public enum ActorCategory
+{
+    Person,           // Individuell person
+    Organization,     // Organisasjon (bedrift, leverandør)
+    Unit             // Militær enhet (avdeling, brigade, kompani)
+}
+
 public enum ActorType
 {
-    Internal,           // Forsvaret ansatte
+    Internal,           // Forsvaret ansatte/enheter
     External,          // Eksterne leverandører/partnere
     Contractor,        // Konsulenter
     Partner,          // Samarbeidspartnere
@@ -21,28 +28,45 @@ public enum SecurityClearance
 public class Actor
 {
     public int Id { get; set; }
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
+    public ActorCategory ActorCategory { get; set; } = ActorCategory.Person;
+    
+    // Personal information (for Person category)
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    
+    // Organization/Unit information  
+    public string? OrganizationName { get; set; }
+    public string? UnitName { get; set; }
+    public string? UnitType { get; set; } // Brigade, Battalion, Kompani, etc.
+    public string? UnitCode { get; set; } // Military unit identifier
+    
+    // Common contact information
     public string Email { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public ActorType ActorType { get; set; }
     public SecurityClearance SecurityClearance { get; set; } = SecurityClearance.None;
     
-    // Organizational information
-    public string? OrganizationName { get; set; }
+    // Additional organizational information
     public string? Department { get; set; }
     public string? Position { get; set; }
     public string? ManagerName { get; set; }
     public string? ManagerEmail { get; set; }
+    
+    // Organization-specific fields
+    public string? RegistrationNumber { get; set; } // Org number for companies
+    public string? ParentOrganization { get; set; } // Parent company/organization
+    public int? EmployeeCount { get; set; }
+    
+    // Unit-specific fields  
+    public string? CommandStructure { get; set; } // Which command the unit reports to
+    public string? UnitMission { get; set; } // Unit's primary mission
+    public int? PersonnelCount { get; set; } // Number of personnel in unit
     
     // Location and contact
     public string? GeographicLocation { get; set; }
     public string? Address { get; set; }
     public string? PreferredLanguage { get; set; } = "NO";
     
-    // Technical competence areas
-    public string? CompetenceAreas { get; set; } // JSON array of competence areas
-    public string? TechnicalSkills { get; set; } // JSON array of skills
     
     // Contract and access information (for external actors)
     public string? ContractNumber { get; set; }
@@ -62,6 +86,15 @@ public class Actor
     // Navigation properties
     public ICollection<ActorRole> ActorRoles { get; set; } = new List<ActorRole>();
     public ICollection<ActorNote> Notes { get; set; } = new List<ActorNote>();
+    
+    // Computed properties
+    public string DisplayName => ActorCategory switch
+    {
+        ActorCategory.Person => $"{FirstName} {LastName}".Trim(),
+        ActorCategory.Organization => OrganizationName ?? "Ukjent organisasjon",
+        ActorCategory.Unit => UnitName ?? "Ukjent enhet",
+        _ => "Ukjent aktør"
+    };
 }
 
 // Junction table for Actor-Role relationships

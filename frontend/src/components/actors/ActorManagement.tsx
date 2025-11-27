@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ActorList } from './ActorList.tsx';
 import { ActorForm } from './ActorForm.tsx';
-import { ActorSearch, ActorType, SecurityClearance } from './ActorSearch.tsx';
+import { ActorSearch, ActorCategory, ActorType, SecurityClearance } from './ActorSearch.tsx';
 import { ActorDetails } from './ActorDetails.tsx';
 import { actorService, Actor, ActorSearch as ActorSearchType, CreateActor, UpdateActor } from '../../services/actorService.ts';
 import './actors.css';

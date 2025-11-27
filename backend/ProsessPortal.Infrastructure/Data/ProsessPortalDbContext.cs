@@ -104,11 +104,20 @@ public class ProsessPortalDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Email).IsUnique();
-            entity.Property(e => e.FirstName).HasMaxLength(50).IsRequired();
-            entity.Property(e => e.LastName).HasMaxLength(50).IsRequired();
+            
+            // Personal information (nullable for organizations/units)
+            entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.LastName).HasMaxLength(50);
+            
+            // Organization/Unit information
+            entity.Property(e => e.OrganizationName).HasMaxLength(100);
+            entity.Property(e => e.UnitName).HasMaxLength(100);
+            entity.Property(e => e.UnitType).HasMaxLength(50);
+            entity.Property(e => e.UnitCode).HasMaxLength(50);
+            
+            // Common fields
             entity.Property(e => e.Email).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Phone).HasMaxLength(20);
-            entity.Property(e => e.OrganizationName).HasMaxLength(100);
             entity.Property(e => e.Department).HasMaxLength(100);
             entity.Property(e => e.Position).HasMaxLength(100);
             entity.Property(e => e.ManagerName).HasMaxLength(100);
@@ -116,10 +125,16 @@ public class ProsessPortalDbContext : DbContext
             entity.Property(e => e.GeographicLocation).HasMaxLength(100);
             entity.Property(e => e.Address).HasMaxLength(500);
             entity.Property(e => e.PreferredLanguage).HasMaxLength(10);
-            entity.Property(e => e.CompetenceAreas).HasMaxLength(2000);
-            entity.Property(e => e.TechnicalSkills).HasMaxLength(2000);
             entity.Property(e => e.ContractNumber).HasMaxLength(50);
             entity.Property(e => e.VendorId).HasMaxLength(50);
+            
+            // Organization-specific fields
+            entity.Property(e => e.RegistrationNumber).HasMaxLength(50);
+            entity.Property(e => e.ParentOrganization).HasMaxLength(100);
+            
+            // Unit-specific fields
+            entity.Property(e => e.CommandStructure).HasMaxLength(100);
+            entity.Property(e => e.UnitMission).HasMaxLength(500);
             
             entity.HasOne(e => e.CreatedByUser)
                 .WithMany()
@@ -131,8 +146,10 @@ public class ProsessPortalDbContext : DbContext
                 .HasForeignKey(e => e.UpdatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
                 
+            entity.HasIndex(e => e.ActorCategory);
             entity.HasIndex(e => e.ActorType);
             entity.HasIndex(e => e.OrganizationName);
+            entity.HasIndex(e => e.UnitName);
             entity.HasIndex(e => e.SecurityClearance);
             entity.HasIndex(e => e.IsActive);
         });
@@ -179,12 +196,13 @@ public class ProsessPortalDbContext : DbContext
         });
         
         // Seed default roles
+        var fixedDateTime = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         modelBuilder.Entity<Role>().HasData(
-            new Role { Id = 1, Name = RoleNames.Admin, Description = "Systemadministrator med full tilgang" },
-            new Role { Id = 2, Name = RoleNames.ProsessEier, Description = "Eier av prosesser, kan redigere og godkjenne" },
-            new Role { Id = 3, Name = RoleNames.QA, Description = "Kvalitetssikring, kan godkjenne endringer" },
-            new Role { Id = 4, Name = RoleNames.SME, Description = "Fagekspert, kan foreslå endringer" },
-            new Role { Id = 5, Name = RoleNames.Bruker, Description = "Vanlig bruker, kun lesetilgang" }
+            new Role { Id = 1, Name = RoleNames.Admin, Description = "Systemadministrator med full tilgang", CreatedAt = fixedDateTime },
+            new Role { Id = 2, Name = RoleNames.ProsessEier, Description = "Eier av prosesser, kan redigere og godkjenne", CreatedAt = fixedDateTime },
+            new Role { Id = 3, Name = RoleNames.QA, Description = "Kvalitetssikring, kan godkjenne endringer", CreatedAt = fixedDateTime },
+            new Role { Id = 4, Name = RoleNames.SME, Description = "Fagekspert, kan foreslå endringer", CreatedAt = fixedDateTime },
+            new Role { Id = 5, Name = RoleNames.Bruker, Description = "Vanlig bruker, kun lesetilgang", CreatedAt = fixedDateTime }
         );
         
         // Seed default permissions
@@ -628,9 +646,11 @@ public class ProsessPortalDbContext : DbContext
         var baseDate = new DateTime(2025, 11, 23, 17, 0, 0, DateTimeKind.Utc);
         
         modelBuilder.Entity<Actor>().HasData(
+            // Person - Internal
             new Actor 
             {
                 Id = 1,
+                ActorCategory = ActorCategory.Person,
                 FirstName = "Lars",
                 LastName = "Johansen",
                 Email = "lars.johansen@forsvaret.no",
@@ -642,34 +662,15 @@ public class ProsessPortalDbContext : DbContext
                 Position = "IT-arkitekt",
                 GeographicLocation = "Oslo",
                 PreferredLanguage = "NO",
-                CompetenceAreas = "[\"IT-arkitektur\", \"Sikkerhet\", \"Systemintegrasjon\"]",
-                TechnicalSkills = "[\"Azure\", \"C#\", \".NET\", \"Docker\"]",
                 IsActive = true,
                 CreatedAt = baseDate.AddDays(-60),
                 CreatedByUserId = 1
             },
+            // Person - External
             new Actor 
             {
                 Id = 2,
-                FirstName = "Kari",
-                LastName = "Andersen",
-                Email = "kari.andersen@forsvaret.no",
-                Phone = "+47 87654321",
-                ActorType = ActorType.Internal,
-                SecurityClearance = SecurityClearance.Confidential,
-                OrganizationName = "Forsvaret",
-                Department = "HR",
-                Position = "HR-spesialist",
-                GeographicLocation = "Bergen",
-                PreferredLanguage = "NO",
-                CompetenceAreas = "[\"HR-prosesser\", \"Rekruttering\", \"Personalhåndtering\"]",
-                IsActive = true,
-                CreatedAt = baseDate.AddDays(-45),
-                CreatedByUserId = 1
-            },
-            new Actor 
-            {
-                Id = 3,
+                ActorCategory = ActorCategory.Person,
                 FirstName = "John",
                 LastName = "Smith",
                 Email = "john.smith@techcorp.com",
@@ -681,8 +682,6 @@ public class ProsessPortalDbContext : DbContext
                 Position = "Senior konsulent",
                 GeographicLocation = "Oslo",
                 PreferredLanguage = "EN",
-                CompetenceAreas = "[\"IT-support\", \"Systemadministrasjon\"]",
-                TechnicalSkills = "[\"Windows Server\", \"Active Directory\", \"Exchange\"]",
                 ContractNumber = "K-2025-001",
                 ContractStartDate = baseDate.AddDays(-90),
                 ContractEndDate = baseDate.AddDays(275),
@@ -691,24 +690,71 @@ public class ProsessPortalDbContext : DbContext
                 CreatedAt = baseDate.AddDays(-90),
                 CreatedByUserId = 1
             },
+            // Organization - External
+            new Actor 
+            {
+                Id = 3,
+                ActorCategory = ActorCategory.Organization,
+                OrganizationName = "TechCorp AS",
+                Email = "contact@techcorp.com",
+                Phone = "+47 22 12 34 56",
+                ActorType = ActorType.Vendor,
+                SecurityClearance = SecurityClearance.Restricted,
+                Department = "IT Services",
+                GeographicLocation = "Oslo",
+                Address = "Teknologigaten 15, 0150 Oslo",
+                RegistrationNumber = "987654321",
+                EmployeeCount = 150,
+                ParentOrganization = "TechCorp International",
+                ContractNumber = "K-2025-001",
+                ContractStartDate = baseDate.AddDays(-90),
+                ContractEndDate = baseDate.AddDays(275),
+                VendorId = "TECH001",
+                IsActive = true,
+                CreatedAt = baseDate.AddDays(-90),
+                CreatedByUserId = 1
+            },
+            // Unit - Internal
             new Actor 
             {
                 Id = 4,
-                FirstName = "Maria",
-                LastName = "Hansen",
-                Email = "maria.hansen@forsvaret.no",
-                Phone = "+47 65432109",
+                ActorCategory = ActorCategory.Unit,
+                UnitName = "Cyber Brigade",
+                UnitType = "Brigade",
+                UnitCode = "CYB-BDE",
+                Email = "cyb.bde@forsvaret.no",
+                Phone = "+47 23 09 50 00",
                 ActorType = ActorType.Internal,
-                SecurityClearance = SecurityClearance.TopSecret,
+                SecurityClearance = SecurityClearance.Secret,
                 OrganizationName = "Forsvaret",
-                Department = "Sikkerhet",
-                Position = "Sikkerhetsspesialist",
-                GeographicLocation = "Trondheim",
-                PreferredLanguage = "NO",
-                CompetenceAreas = "[\"Informasjonssikkerhet\", \"Compliance\", \"Risikoanalyse\"]",
-                TechnicalSkills = "[\"ISO 27001\", \"Sikkerhetsvurderinger\", \"Penetrasjonstesting\"]",
+                GeographicLocation = "Lillehammer",
+                CommandStructure = "Hærstaben",
+                UnitMission = "Ansvarlig for cyberoperasjoner og digitalt forsvar",
+                PersonnelCount = 1200,
                 IsActive = true,
-                CreatedAt = baseDate.AddDays(-30),
+                CreatedAt = baseDate.AddDays(-120),
+                CreatedByUserId = 1
+            },
+            // Unit - Smaller unit
+            new Actor 
+            {
+                Id = 5,
+                ActorCategory = ActorCategory.Unit,
+                UnitName = "2. Bataljon",
+                UnitType = "Bataljon", 
+                UnitCode = "2-BTN",
+                Email = "2btn@forsvaret.no",
+                Phone = "+47 75 50 30 00",
+                ActorType = ActorType.Internal,
+                SecurityClearance = SecurityClearance.Confidential,
+                OrganizationName = "Forsvaret",
+                Department = "Brigade Nord",
+                GeographicLocation = "Setermoen",
+                CommandStructure = "Brigade Nord",
+                UnitMission = "Stridsklare styrker for forsvar av Nord-Norge",
+                PersonnelCount = 600,
+                IsActive = true,
+                CreatedAt = baseDate.AddDays(-100),
                 CreatedByUserId = 1
             }
         );

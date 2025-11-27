@@ -28,8 +28,6 @@ public interface IActorService
     // Search and filter methods
     Task<List<string>> GetOrganizationsAsync();
     Task<List<string>> GetDepartmentsAsync();
-    Task<List<string>> GetCompetenceAreasAsync();
-    Task<List<string>> GetTechnicalSkillsAsync();
     
     // Statistics
     Task<Dictionary<ActorType, int>> GetActorTypeStatsAsync();

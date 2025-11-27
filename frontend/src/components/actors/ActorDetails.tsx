@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Actor, ActorType, SecurityClearance, RoleAssignment, ActorNote, actorService, CreateActorNote } from '../../services/actorService.ts';
+import { Actor, ActorCategory, ActorType, SecurityClearance, RoleAssignment, ActorNote, actorService, CreateActorNote } from '../../services/actorService.ts';
 
 interface ActorDetailsProps {
   actor: Actor;
@@ -104,7 +104,7 @@ export const ActorDetails: React.FC<ActorDetailsProps> = ({
     <div className="actor-details">
       <div className="actor-details-header">
         <div className="header-info">
-          <h1>{actor.fullName}</h1>
+          <h1>{actor.displayName}</h1>
           <div className="header-meta">
             <span className={`actor-type type-${actor.actorType}`}>
               {getActorTypeLabel(actor.actorType)}

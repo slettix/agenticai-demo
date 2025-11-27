@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { prosessService } from '../../services/prosessService.ts';
 import { agentService } from '../../services/agentService.ts';
 import type { ProcessGenerationRequest, AgentJobStatus, ProcessGenerationResult } from '../../types/agent.ts';
@@ -9,10 +10,7 @@ import { AIProcessSuggestions } from './AIProcessSuggestions.tsx';
 import { ProcessTemplateManager } from './ProcessTemplateManager.tsx';
 import './CreateProsessForm.css';
 
-interface CreateProsessFormProps {
-  onSuccess: (prosessId: number) => void;
-  onCancel: () => void;
-}
+interface CreateProsessFormProps {}
 
 interface ITILArea {
   name: string;
@@ -55,7 +53,8 @@ const convertStepType = (numericType: number): StepType => {
   }
 };
 
-export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess, onCancel }) => {
+export const CreateProsessForm: React.FC<CreateProsessFormProps> = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -185,8 +184,8 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
       console.log('Response from backend:', newProsess);
       
       if (newProsess && newProsess.id) {
-        console.log('Process created successfully, calling onSuccess with ID:', newProsess.id);
-        onSuccess(newProsess.id);
+        console.log('Process created successfully, navigating to process ID:', newProsess.id);
+        navigate(`/prosess/${newProsess.id}`);
       } else {
         throw new Error('Prosess ble opprettet, men ID mangler i responsen');
       }
@@ -201,10 +200,10 @@ export const CreateProsessForm: React.FC<CreateProsessFormProps> = ({ onSuccess,
   const handleCancel = () => {
     if (hasUnsavedChanges()) {
       if (window.confirm('Du har ulagrede endringer. Er du sikker på at du vil avbryte?')) {
-        onCancel();
+        navigate('/prosesser');
       }
     } else {
-      onCancel();
+      navigate('/prosesser');
     }
   };
 

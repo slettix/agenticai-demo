@@ -93,6 +93,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("permission", "view_qa_queue"));
     options.AddPolicy("RequireAdminRole", policy => 
         policy.RequireRole("Admin"));
+    options.AddPolicy("RequireManageRoles", policy => 
+        policy.RequireClaim("permission", "manage_roles"));
 });
 
 // CORS
@@ -101,7 +103,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", builder =>
     {
         builder
-            .WithOrigins("http://localhost:3000") // React dev server
+            .WithOrigins(
+                "http://localhost:3000", 
+                "http://127.0.0.1:3000"
+            ) // React dev server
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -116,6 +121,7 @@ builder.Services.AddScoped<IApprovalService, ApprovalService>();
 builder.Services.AddScoped<IEditingService, EditingService>();
 builder.Services.AddScoped<IDeletionService, DeletionService>();
 builder.Services.AddScoped<IActorService, ActorService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // HTTP client for agent service
 builder.Services.AddHttpClient<IAgentService, AgentService>(client =>
@@ -135,15 +141,39 @@ using (var scope = app.Services.CreateScope())
     
     try 
     {
-        // Create database schema - use EnsureCreated for now
-        bool created = context.Database.EnsureCreated();
-        if (created)
+        // Check if database exists and ensure it's created if not
+        if (!context.Database.CanConnect())
         {
-            Log.Information("Database schema created successfully");
+            Log.Information("Database doesn't exist, creating it...");
+            context.Database.EnsureCreated();
+            Log.Information("Database created successfully");
         }
         else
         {
-            Log.Information("Database schema already exists");
+            // Apply pending migrations
+            var pendingMigrations = context.Database.GetPendingMigrations();
+            if (pendingMigrations.Any())
+            {
+                Log.Information("Applying {Count} pending migrations: {Migrations}", 
+                    pendingMigrations.Count(), string.Join(", ", pendingMigrations));
+                
+                try 
+                {
+                    context.Database.Migrate();
+                    Log.Information("Database schema updated successfully");
+                }
+                catch (Npgsql.PostgresException ex) when (ex.SqlState == "42P07") // Table already exists
+                {
+                    Log.Warning("Some tables already exist, attempting to mark migrations as applied");
+                    // If tables already exist but migrations aren't recorded, we'll use EnsureCreated approach
+                    context.Database.EnsureCreated();
+                    Log.Information("Database schema ensured");
+                }
+            }
+            else
+            {
+                Log.Information("Database schema is up to date");
+            }
         }
         
         // Add new deletion columns if they don't exist
@@ -183,7 +213,206 @@ using (var scope = app.Services.CreateScope())
                 );
             ");
             
-            Log.Information("Database schema updated with deletion fields");
+            // Create Actors table if it doesn't exist
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE IF NOT EXISTS ""Actors"" (
+                    ""Id"" serial PRIMARY KEY,
+                    ""ActorCategory"" integer NOT NULL,
+                    ""ActorType"" integer NOT NULL,
+                    ""FirstName"" varchar(100),
+                    ""LastName"" varchar(100),
+                    ""Email"" varchar(255),
+                    ""Phone"" varchar(20),
+                    ""OrganizationName"" varchar(200),
+                    ""RegistrationNumber"" varchar(50),
+                    ""ParentOrganization"" varchar(200),
+                    ""EmployeeCount"" integer,
+                    ""UnitName"" varchar(200),
+                    ""UnitType"" varchar(100),
+                    ""UnitCode"" varchar(50),
+                    ""CommandStructure"" varchar(100),
+                    ""UnitMission"" varchar(500),
+                    ""PersonnelCount"" integer,
+                    ""Department"" varchar(200),
+                    ""Position"" varchar(100),
+                    ""ManagerName"" varchar(200),
+                    ""ManagerEmail"" varchar(255),
+                    ""GeographicLocation"" varchar(300),
+                    ""Address"" varchar(300),
+                    ""PreferredLanguage"" varchar(10) DEFAULT 'NO',
+                    ""ContractNumber"" varchar(100),
+                    ""ContractStartDate"" timestamp with time zone,
+                    ""ContractEndDate"" timestamp with time zone,
+                    ""VendorId"" varchar(100),
+                    ""SecurityClearance"" integer NOT NULL DEFAULT 0,
+                    ""IsActive"" boolean NOT NULL DEFAULT TRUE,
+                    ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                    ""CreatedByUserId"" integer,
+                    ""UpdatedAt"" timestamp with time zone,
+                    ""UpdatedByUserId"" integer,
+                    FOREIGN KEY (""CreatedByUserId"") REFERENCES ""Users""(""Id"") ON DELETE SET NULL,
+                    FOREIGN KEY (""UpdatedByUserId"") REFERENCES ""Users""(""Id"") ON DELETE SET NULL
+                );
+            ");
+
+            // Add missing columns to existing Actors table
+            await context.Database.ExecuteSqlRawAsync(@"
+                DO $$ 
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'ManagerName') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""ManagerName"" varchar(200);
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'ManagerEmail') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""ManagerEmail"" varchar(255);
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'GeographicLocation') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""GeographicLocation"" varchar(300);
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'Address') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""Address"" varchar(300);
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'PreferredLanguage') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""PreferredLanguage"" varchar(10) DEFAULT 'NO';
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'ContractNumber') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""ContractNumber"" varchar(100);
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'ContractStartDate') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""ContractStartDate"" timestamp with time zone;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'ContractEndDate') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""ContractEndDate"" timestamp with time zone;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'Actors' AND column_name = 'VendorId') THEN
+                        ALTER TABLE ""Actors"" ADD COLUMN ""VendorId"" varchar(100);
+                    END IF;
+                END $$;
+            ");
+
+            // Create indexes for Actors table
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE INDEX IF NOT EXISTS ""IX_Actors_ActorCategory"" ON ""Actors"" (""ActorCategory"");
+                CREATE INDEX IF NOT EXISTS ""IX_Actors_ActorType"" ON ""Actors"" (""ActorType"");
+                CREATE INDEX IF NOT EXISTS ""IX_Actors_Email"" ON ""Actors"" (""Email"");
+                CREATE INDEX IF NOT EXISTS ""IX_Actors_IsActive"" ON ""Actors"" (""IsActive"");
+                CREATE INDEX IF NOT EXISTS ""IX_Actors_OrganizationName"" ON ""Actors"" (""OrganizationName"");
+                CREATE INDEX IF NOT EXISTS ""IX_Actors_UnitName"" ON ""Actors"" (""UnitName"");
+                CREATE INDEX IF NOT EXISTS ""IX_Actors_SecurityClearance"" ON ""Actors"" (""SecurityClearance"");
+            ");
+
+            // Create ActorRoles table if it doesn't exist
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE IF NOT EXISTS ""ActorRoles"" (
+                    ""Id"" serial PRIMARY KEY,
+                    ""ActorId"" integer NOT NULL,
+                    ""RoleId"" integer NOT NULL,
+                    ""AssignedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                    ""AssignedByUserId"" integer NOT NULL,
+                    ""ValidFrom"" timestamp with time zone,
+                    ""ValidTo"" timestamp with time zone,
+                    ""IsActive"" boolean NOT NULL DEFAULT TRUE,
+                    ""Notes"" text,
+                    FOREIGN KEY (""ActorId"") REFERENCES ""Actors""(""Id"") ON DELETE CASCADE,
+                    FOREIGN KEY (""RoleId"") REFERENCES ""Roles""(""Id"") ON DELETE CASCADE,
+                    FOREIGN KEY (""AssignedByUserId"") REFERENCES ""Users""(""Id"") ON DELETE RESTRICT
+                );
+                CREATE INDEX IF NOT EXISTS ""IX_ActorRoles_ActorId"" ON ""ActorRoles"" (""ActorId"");
+                CREATE INDEX IF NOT EXISTS ""IX_ActorRoles_RoleId"" ON ""ActorRoles"" (""RoleId"");
+            ");
+
+            // Add missing columns to existing ActorRoles table
+            await context.Database.ExecuteSqlRawAsync(@"
+                DO $$ 
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'ActorRoles' AND column_name = 'AssignedByUserId') THEN
+                        ALTER TABLE ""ActorRoles"" ADD COLUMN ""AssignedByUserId"" integer NOT NULL DEFAULT 1;
+                        -- Add foreign key constraint
+                        ALTER TABLE ""ActorRoles"" ADD CONSTRAINT ""FK_ActorRoles_Users_AssignedByUserId"" 
+                            FOREIGN KEY (""AssignedByUserId"") REFERENCES ""Users""(""Id"") ON DELETE RESTRICT;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'ActorRoles' AND column_name = 'ValidFrom') THEN
+                        ALTER TABLE ""ActorRoles"" ADD COLUMN ""ValidFrom"" timestamp with time zone;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'ActorRoles' AND column_name = 'ValidTo') THEN
+                        ALTER TABLE ""ActorRoles"" ADD COLUMN ""ValidTo"" timestamp with time zone;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'ActorRoles' AND column_name = 'IsActive') THEN
+                        ALTER TABLE ""ActorRoles"" ADD COLUMN ""IsActive"" boolean NOT NULL DEFAULT TRUE;
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'ActorRoles' AND column_name = 'Notes') THEN
+                        ALTER TABLE ""ActorRoles"" ADD COLUMN ""Notes"" text;
+                    END IF;
+                END $$;
+            ");
+
+            // Create ActorNotes table if it doesn't exist
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE IF NOT EXISTS ""ActorNotes"" (
+                    ""Id"" serial PRIMARY KEY,
+                    ""ActorId"" integer NOT NULL,
+                    ""Note"" text NOT NULL,
+                    ""Category"" varchar(100),
+                    ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT NOW(),
+                    ""CreatedByUserId"" integer NOT NULL,
+                    ""IsPrivate"" boolean NOT NULL DEFAULT FALSE,
+                    FOREIGN KEY (""ActorId"") REFERENCES ""Actors""(""Id"") ON DELETE CASCADE,
+                    FOREIGN KEY (""CreatedByUserId"") REFERENCES ""Users""(""Id"") ON DELETE RESTRICT
+                );
+                CREATE INDEX IF NOT EXISTS ""IX_ActorNotes_ActorId"" ON ""ActorNotes"" (""ActorId"");
+                CREATE INDEX IF NOT EXISTS ""IX_ActorNotes_CreatedByUserId"" ON ""ActorNotes"" (""CreatedByUserId"");
+            ");
+
+            // Add missing columns to existing ActorNotes table
+            await context.Database.ExecuteSqlRawAsync(@"
+                DO $$ 
+                BEGIN
+                    -- Rename Content to Note if Content exists and Note doesn't
+                    IF EXISTS (SELECT 1 FROM information_schema.columns 
+                              WHERE table_name = 'ActorNotes' AND column_name = 'Content') 
+                       AND NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                      WHERE table_name = 'ActorNotes' AND column_name = 'Note') THEN
+                        ALTER TABLE ""ActorNotes"" RENAME COLUMN ""Content"" TO ""Note"";
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'ActorNotes' AND column_name = 'Category') THEN
+                        ALTER TABLE ""ActorNotes"" ADD COLUMN ""Category"" varchar(100);
+                    END IF;
+                    
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name = 'ActorNotes' AND column_name = 'IsPrivate') THEN
+                        ALTER TABLE ""ActorNotes"" ADD COLUMN ""IsPrivate"" boolean NOT NULL DEFAULT FALSE;
+                    END IF;
+                END $$;
+            ");
+            
+            Log.Information("Database schema updated with deletion fields and Actor tables");
         }
         catch (Exception ex)
         {

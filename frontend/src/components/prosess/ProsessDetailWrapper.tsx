@@ -8,9 +8,10 @@ import './ProsessDetail.css';
 interface ProsessDetailWrapperProps {
   prosessId: number;
   onBack: () => void;
+  onEdit?: () => void;
 }
 
-export const ProsessDetailWrapper: React.FC<ProsessDetailWrapperProps> = ({ prosessId, onBack }) => {
+export const ProsessDetailWrapper: React.FC<ProsessDetailWrapperProps> = ({ prosessId, onBack, onEdit }) => {
   const [prosess, setProsess] = useState<ProsessDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -156,7 +157,11 @@ export const ProsessDetailWrapper: React.FC<ProsessDetailWrapperProps> = ({ pros
             <button className="btn-secondary">
               📊 Statistikk
             </button>
-            <button className="btn-secondary">
+            <button 
+              className="btn-secondary"
+              onClick={onEdit}
+              disabled={!onEdit}
+            >
               📝 Rediger
             </button>
             <button className="btn-primary">

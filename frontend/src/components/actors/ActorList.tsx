@@ -1,5 +1,5 @@
 import React from 'react';
-import { Actor, ActorType, SecurityClearance } from '../../services/actorService.ts';
+import { Actor, ActorCategory, ActorType, SecurityClearance } from '../../services/actorService.ts';
 
 interface ActorListProps {
   actors: Actor[];
@@ -30,6 +30,15 @@ export const ActorList: React.FC<ActorListProps> = ({
   onDeactivate,
   onPageChange
 }) => {
+  const getActorCategoryLabel = (category: ActorCategory): string => {
+    switch (category) {
+      case ActorCategory.Person: return 'Person';
+      case ActorCategory.Organization: return 'Org';
+      case ActorCategory.Unit: return 'Enhet';
+      default: return 'Ukjent';
+    }
+  };
+
   const getActorTypeLabel = (type: ActorType): string => {
     switch (type) {
       case ActorType.Internal: return 'Intern';
@@ -164,6 +173,7 @@ export const ActorList: React.FC<ActorListProps> = ({
           <div className="actors-table">
             <div className="table-header">
               <div className="col-name">Navn</div>
+              <div className="col-category">Kategori</div>
               <div className="col-organization">Organisasjon</div>
               <div className="col-type">Type</div>
               <div className="col-clearance">Sikkerhetsnivå</div>
@@ -177,16 +187,27 @@ export const ActorList: React.FC<ActorListProps> = ({
                 <div key={actor.id} className={`actor-row ${!actor.isActive ? 'inactive' : ''}`}>
                   <div className="col-name">
                     <div className="actor-name">
-                      <strong>{actor.fullName}</strong>
+                      <strong>{actor.displayName}</strong>
                       {actor.position && <span className="position">({actor.position})</span>}
                     </div>
                     {actor.department && (
                       <div className="department">{actor.department}</div>
                     )}
+                    {actor.actorCategory === ActorCategory.Unit && actor.unitCode && (
+                      <div className="unit-code">Kode: {actor.unitCode}</div>
+                    )}
+                  </div>
+
+                  <div className="col-category">
+                    <span className={`actor-category category-${actor.actorCategory}`}>
+                      {getActorCategoryLabel(actor.actorCategory)}
+                    </span>
                   </div>
 
                   <div className="col-organization">
-                    {actor.organizationName || '-'}
+                    {actor.actorCategory === ActorCategory.Organization ? actor.organizationName : 
+                     actor.actorCategory === ActorCategory.Unit ? actor.unitName :
+                     actor.organizationName || '-'}
                   </div>
 
                   <div className="col-type">
