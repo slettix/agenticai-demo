@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext.tsx';
 import { LoginForm } from './components/auth/LoginForm.tsx';
 import { RegisterForm } from './components/auth/RegisterForm.tsx';
@@ -12,53 +12,43 @@ import { ApprovalQueue } from './components/approval/ApprovalQueue.tsx';
 import { DeletedProcessesList } from './components/deletion/DeletedProcessesList.tsx';
 import { ActorManagement } from './components/actors/ActorManagement.tsx';
 import { RoleManagement } from './components/roles/RoleManagement.tsx';
+import DropdownNavigation from './components/navigation/DropdownNavigation.tsx';
 import { ForsvaretLogo } from './components/common/ForsvaretLogo.tsx';
 import './components/auth/auth.css';
 import './components/prosess/prosess.css';
 import './components/actors/actors.css';
 import './components/roles/roles.css';
+import './components/navigation/navigation.css';
 import './App.css';
 
-// Navigation Component
-const Navigation: React.FC = () => {
-  const { user, logout } = useAuth();
+// Placeholder for system administration pages
+const SystemSettings: React.FC = () => (
+  <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <h2>🔧 Systeminnstillinger</h2>
+    <p>Systemkonfigurasjon og innstillinger vil implementeres her.</p>
+  </div>
+);
 
-  if (!user) return null;
+const SystemReports: React.FC = () => (
+  <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <h2>📊 Systemrapporter</h2>
+    <p>Systemrapporter og analytics vil implementeres her.</p>
+  </div>
+);
 
-  return (
-    <nav className="app-nav">
-      <ul>
-        <li>
-          <Link to="/prosesser">📋 Operasjonsprosedyrer</Link>
-        </li>
-        
-        <ProtectedRoute requiredPermission="view_qa_queue">
-          <li><Link to="/godkjenning">✅ Til kvalitetssikring</Link></li>
-        </ProtectedRoute>
-        
-        <ProtectedRoute requiredPermission="delete_prosess">
-          <li><Link to="/slettede-prosesser">🗑️ Arkiverte prosedyrer</Link></li>
-        </ProtectedRoute>
-        
-        <ProtectedRoute requiredRole="ProsessEier">
-          <li><a href="#mine-prosesser">📝 Mine prosedyrer</a></li>
-        </ProtectedRoute>
-        
-        <ProtectedRoute requiredRole="Admin">
-          <li><Link to="/aktorer">👥 Aktører</Link></li>
-        </ProtectedRoute>
-        
-        <ProtectedRoute requiredPermission="manage_roles">
-          <li><Link to="/roller">🛡️ Roller og Tilganger</Link></li>
-        </ProtectedRoute>
-        
-        <ProtectedRoute requiredRole="Admin">
-          <li><a href="#admin">⚙️ Systemadministrasjon</a></li>
-        </ProtectedRoute>
-      </ul>
-    </nav>
-  );
-};
+const AuditLogs: React.FC = () => (
+  <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <h2>🔍 Audit Logs</h2>
+    <p>Audit logg og systemovervåking vil implementeres her.</p>
+  </div>
+);
+
+const MyProcesses: React.FC = () => (
+  <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <h2>📝 Mine prosedyrer</h2>
+    <p>Oversikt over prosedyrer du eier eller er ansvarlig for.</p>
+  </div>
+);
 
 // Main App Content Component
 const AppContent: React.FC = () => {
@@ -102,31 +92,24 @@ const AppContent: React.FC = () => {
               <ForsvaretLogo size="medium" />
               <h1>Forsvarets Prosessportal</h1>
             </div>
-            <div className="user-info">
-              <span>Innlogget: {user.firstName} {user.lastName}</span>
-              <span className="user-roles">
-                {user.roles.map(role => (
-                  <span key={role} className="role-badge">{role}</span>
-                ))}
-              </span>
-              <button onClick={logout} className="logout-button">
-                Logg ut
-              </button>
-            </div>
           </div>
         </header>
 
-        <Navigation />
+        <DropdownNavigation />
 
         <main className="app-main">
           <Routes>
+            {/* Home/Default routes */}
             <Route path="/" element={<Navigate to="/prosesser" replace />} />
             <Route path="/prosesser" element={<ProsessListe />} />
+            
+            {/* Process detail routes */}
             <Route path="/prosess/:id" element={<ProsessDetail />} />
             <Route path="/prosess/:id/rediger" element={<ProsessEditor />} />
-            <Route path="/opprett-prosess" element={<CreateProsessForm />} />
+            
+            {/* Process Administration routes */}
             <Route 
-              path="/godkjenning" 
+              path="/prosessadministrasjon/godkjenning" 
               element={
                 <ProtectedRoute requiredPermission="view_qa_queue">
                   <ApprovalQueue />
@@ -134,15 +117,33 @@ const AppContent: React.FC = () => {
               } 
             />
             <Route 
-              path="/slettede-prosesser" 
+              path="/prosessadministrasjon/opprett" 
+              element={
+                <ProtectedRoute requiredPermission="create_prosess">
+                  <CreateProsessForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/prosessadministrasjon/mine" 
+              element={
+                <ProtectedRoute requiredRole="ProsessEier">
+                  <MyProcesses />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/prosessadministrasjon/arkiverte" 
               element={
                 <ProtectedRoute requiredPermission="delete_prosess">
                   <DeletedProcessesList />
                 </ProtectedRoute>
               } 
             />
+            
+            {/* User Administration routes */}
             <Route 
-              path="/aktorer" 
+              path="/brukeradministrasjon/aktorer" 
               element={
                 <ProtectedRoute requiredRole="Admin">
                   <ActorManagement />
@@ -150,13 +151,46 @@ const AppContent: React.FC = () => {
               } 
             />
             <Route 
-              path="/roller" 
+              path="/brukeradministrasjon/roller" 
               element={
                 <ProtectedRoute requiredPermission="manage_roles">
                   <RoleManagement />
                 </ProtectedRoute>
               } 
             />
+            
+            {/* System Administration routes */}
+            <Route 
+              path="/systemadministrasjon/innstillinger" 
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <SystemSettings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/systemadministrasjon/rapporter" 
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <SystemReports />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/systemadministrasjon/audit" 
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AuditLogs />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Legacy redirects for backward compatibility */}
+            <Route path="/opprett-prosess" element={<Navigate to="/prosessadministrasjon/opprett" replace />} />
+            <Route path="/godkjenning" element={<Navigate to="/prosessadministrasjon/godkjenning" replace />} />
+            <Route path="/slettede-prosesser" element={<Navigate to="/prosessadministrasjon/arkiverte" replace />} />
+            <Route path="/aktorer" element={<Navigate to="/brukeradministrasjon/aktorer" replace />} />
+            <Route path="/roller" element={<Navigate to="/brukeradministrasjon/roller" replace />} />
           </Routes>
         </main>
       </div>
