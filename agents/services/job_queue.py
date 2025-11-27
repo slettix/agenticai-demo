@@ -102,18 +102,21 @@ class JobQueue:
         from agents.revision_agent import RevisionAgent
         from agents.document_classifier import DocumentClassifierAgent
         from agents.process_optimizer import ProcessOptimizerAgent
+        from agents.siam_specialist import SIAMSpecialistAgent
         
         # Initialize agents
         process_generator = ProcessGeneratorAgent()
         revision_agent = RevisionAgent()
         document_classifier = DocumentClassifierAgent()
         process_optimizer = ProcessOptimizerAgent()
+        siam_specialist = SIAMSpecialistAgent()
         
         agents = {
             "process_generator": process_generator,
             "revision_agent": revision_agent,
             "document_classifier": document_classifier,
-            "process_optimizer": process_optimizer
+            "process_optimizer": process_optimizer,
+            "siam_specialist": siam_specialist
         }
 
         print("🤖 Job queue worker started")
@@ -151,6 +154,8 @@ class JobQueue:
                         result = await agent.classify_document(job.request_data, self._update_job_progress(job))
                     elif job.agent_type == "process_optimizer":
                         result = await agent.analyze_process_performance(job.request_data, self._update_job_progress(job))
+                    elif job.agent_type == "siam_specialist":
+                        result = await self._process_siam_job(agent, job.request_data, self._update_job_progress(job))
                     else:
                         raise ValueError(f"Unsupported agent type: {job.agent_type}")
                     
@@ -194,3 +199,43 @@ class JobQueue:
             print(f"📊 Job {job.job_id} progress: {progress}% - {message or job.message}")
         
         return update_progress
+    
+    async def _process_siam_job(self, agent, request_data: Dict[str, Any], progress_callback):
+        """Process SIAM specialist job based on analysis type"""
+        analysis_type = request_data.get("analysis_type", "scenario")
+        
+        await progress_callback(10, "Starting SIAM analysis...")
+        
+        if analysis_type == "scenario":
+            await progress_callback(30, "Analyzing multi-vendor scenario...")
+            result = agent.analyze_multi_vendor_scenario(
+                request_data.get("scenario_description", ""),
+                request_data.get("requirements", [])
+            )
+        elif analysis_type == "governance":
+            await progress_callback(30, "Generating governance guidance...")
+            result = agent.provide_governance_guidance(
+                request_data.get("vendor_count", 3),
+                request_data.get("service_complexity", "medium"),
+                request_data.get("organizational_maturity", "medium")
+            )
+        elif analysis_type == "vendor_assessment":
+            await progress_callback(30, "Assessing vendor readiness...")
+            result = agent.assess_vendor_readiness(
+                request_data.get("vendor_profiles", [])
+            )
+        elif analysis_type == "integration":
+            await progress_callback(30, "Analyzing integration requirements...")
+            result = agent.suggest_integration_approach(
+                request_data.get("integration_requirements", {})
+            )
+        elif analysis_type == "sla":
+            await progress_callback(30, "Generating SLA framework...")
+            result = agent.generate_sla_framework(
+                request_data.get("service_requirements", {})
+            )
+        else:
+            raise ValueError(f"Unknown SIAM analysis type: {analysis_type}")
+        
+        await progress_callback(90, "Finalizing SIAM recommendations...")
+        return result

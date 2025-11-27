@@ -12,7 +12,14 @@ from agents.process_generator import ProcessGeneratorAgent
 from agents.revision_agent import RevisionAgent
 from agents.document_classifier import DocumentClassifierAgent
 from agents.process_optimizer import ProcessOptimizerAgent
-from models.requests import ProcessGenerationRequest, RevisionRequest
+from agents.siam_specialist import SIAMSpecialistAgent
+from models.requests import (
+    ProcessGenerationRequest, 
+    RevisionRequest, 
+    SIAMAnalysisRequest, 
+    GovernanceGuidanceRequest, 
+    VendorReadinessRequest
+)
 from models.responses import JobResponse, JobStatusResponse
 from services.job_queue import JobQueue
 
@@ -26,7 +33,7 @@ job_queue = JobQueue()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
-    global process_generator, revision_agent, document_classifier, process_optimizer
+    global process_generator, revision_agent, document_classifier, process_optimizer, siam_specialist
     
     # Startup
     print("🤖 Starting AI Agents Service...")
@@ -37,11 +44,13 @@ async def lifespan(app: FastAPI):
         from agents.revision_agent import RevisionAgent
         from agents.document_classifier import DocumentClassifierAgent
         from agents.process_optimizer import ProcessOptimizerAgent
+        from agents.siam_specialist import SIAMSpecialistAgent
         
         process_generator = ProcessGeneratorAgent()
         revision_agent = RevisionAgent()
         document_classifier = DocumentClassifierAgent()
         process_optimizer = ProcessOptimizerAgent()
+        siam_specialist = SIAMSpecialistAgent()
         print("✅ AI Agents initialized successfully")
         
         await job_queue.initialize()
@@ -78,6 +87,7 @@ process_generator = None
 revision_agent = None
 document_classifier = None
 process_optimizer = None
+siam_specialist = None
 
 
 @app.get("/")
@@ -87,7 +97,8 @@ async def root():
         process_generator is not None,
         revision_agent is not None,
         document_classifier is not None,
-        process_optimizer is not None
+        process_optimizer is not None,
+        siam_specialist is not None
     ])
     
     available_agents = []
@@ -95,6 +106,7 @@ async def root():
     if revision_agent: available_agents.append("revision_agent")
     if document_classifier: available_agents.append("document_classifier")
     if process_optimizer: available_agents.append("process_optimizer")
+    if siam_specialist: available_agents.append("siam_specialist")
     
     return {
         "service": "ProsessPortal AI Agents",
@@ -103,6 +115,7 @@ async def root():
         "agents_available": agents_available,
         "agents": available_agents,
         "epic3_features": ["document_classification", "process_optimization"],
+        "epic7_features": ["siam_analysis", "multi_vendor_governance", "vendor_readiness"],
         "message": "Ready to process AI requests" if agents_available else "Some agents not initialized - check OpenAI API key"
     }
 
@@ -235,6 +248,102 @@ async def optimize_process(request: dict):
         raise HTTPException(status_code=500, detail=f"Failed to submit process optimization job: {str(e)}")
 
 
+# Epic 7: SIAM and Multi-Vendor Support Endpoints
+
+@app.post("/api/agents/siam-analysis", response_model=JobResponse)
+async def siam_analysis(request: SIAMAnalysisRequest):
+    """
+    Perform SIAM analysis for multi-vendor scenarios (Epic 7 - Issue #30)
+    """
+    if not siam_specialist:
+        raise HTTPException(status_code=503, detail="SIAM specialist agent is not available.")
+    
+    try:
+        job_id = await job_queue.submit_job(
+            agent_type="siam_specialist",
+            request_data=request.model_dump(),
+            user_id=request.user_id
+        )
+        
+        return JobResponse(
+            job_id=job_id,
+            status="queued",
+            message="SIAM analysis job submitted successfully"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to submit SIAM analysis job: {str(e)}")
+
+
+@app.post("/api/agents/governance-guidance", response_model=JobResponse)
+async def governance_guidance(request: GovernanceGuidanceRequest):
+    """
+    Get SIAM governance guidance for multi-vendor environments (Epic 7)
+    """
+    if not siam_specialist:
+        raise HTTPException(status_code=503, detail="SIAM specialist agent is not available.")
+    
+    try:
+        job_id = await job_queue.submit_job(
+            agent_type="siam_specialist",
+            request_data={**request.model_dump(), "analysis_type": "governance"},
+            user_id=request.user_id
+        )
+        
+        return JobResponse(
+            job_id=job_id,
+            status="queued",
+            message="SIAM governance guidance job submitted successfully"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to submit governance guidance job: {str(e)}")
+
+
+@app.post("/api/agents/vendor-readiness", response_model=JobResponse)
+async def vendor_readiness(request: VendorReadinessRequest):
+    """
+    Assess vendor readiness for SIAM implementation (Epic 7)
+    """
+    if not siam_specialist:
+        raise HTTPException(status_code=503, detail="SIAM specialist agent is not available.")
+    
+    try:
+        job_id = await job_queue.submit_job(
+            agent_type="siam_specialist",
+            request_data={**request.model_dump(), "analysis_type": "vendor_assessment"},
+            user_id=request.user_id
+        )
+        
+        return JobResponse(
+            job_id=job_id,
+            status="queued",
+            message="Vendor readiness assessment job submitted successfully"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to submit vendor readiness job: {str(e)}")
+
+
+@app.get("/api/agents/siam/framework")
+async def get_siam_framework():
+    """
+    Get SIAM framework information (Epic 7)
+    """
+    if not siam_specialist:
+        raise HTTPException(status_code=503, detail="SIAM specialist agent is not available.")
+    
+    try:
+        framework = siam_specialist.get_siam_framework()
+        scenarios = siam_specialist.get_multi_vendor_scenarios()
+        
+        return {
+            "framework": framework,
+            "multi_vendor_scenarios": scenarios,
+            "specializations": siam_specialist.specializations,
+            "message": "SIAM framework data retrieved successfully"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve SIAM framework: {str(e)}")
+
+
 @app.get("/api/agents/epic3/features")
 async def get_epic3_features():
     """
@@ -259,6 +368,47 @@ async def get_epic3_features():
             }
         ],
         "overall_status": "available" if document_classifier and process_optimizer else "partial"
+    }
+
+
+@app.get("/api/agents/epic7/features")
+async def get_epic7_features():
+    """
+    Get available Epic 7 (SIAM and Multi-Vendor Support) features
+    """
+    return {
+        "epic": "Epic 7: SIAM and Multi-Vendor Support",
+        "features": [
+            {
+                "name": "SIAM Analysis",
+                "story": "Issue #30",
+                "description": "AI-powered SIAM scenario analysis and recommendations",
+                "endpoint": "/api/agents/siam-analysis",
+                "available": siam_specialist is not None
+            },
+            {
+                "name": "Governance Guidance",
+                "story": "Issue #30",
+                "description": "Multi-vendor governance structure recommendations",
+                "endpoint": "/api/agents/governance-guidance", 
+                "available": siam_specialist is not None
+            },
+            {
+                "name": "Vendor Readiness Assessment",
+                "story": "Issue #30",
+                "description": "Assess vendor readiness for SIAM implementation",
+                "endpoint": "/api/agents/vendor-readiness",
+                "available": siam_specialist is not None
+            },
+            {
+                "name": "SIAM Framework Access",
+                "story": "Issue #30", 
+                "description": "Access to SIAM framework and best practices",
+                "endpoint": "/api/agents/siam/framework",
+                "available": siam_specialist is not None
+            }
+        ],
+        "overall_status": "available" if siam_specialist else "not_available"
     }
 
 

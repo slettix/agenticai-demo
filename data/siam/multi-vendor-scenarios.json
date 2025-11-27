@@ -1,0 +1,199 @@
+{
+  "multi_vendor_scenarios": {
+    "description": "Common multi-vendor scenarios and SIAM implementation patterns",
+    "scenarios": [
+      {
+        "scenario_name": "IT Infrastructure Outsourcing",
+        "description": "Outsourcing of data center, network, and cloud infrastructure to multiple specialized providers",
+        "typical_structure": {
+          "primary_integrator": "Lead infrastructure provider or retained organization",
+          "vendors": [
+            "Data center services provider",
+            "Network services provider", 
+            "Cloud services provider (AWS, Azure, Google)",
+            "Security services provider"
+          ],
+          "retained_functions": [
+            "Service integration management",
+            "Vendor relationship management",
+            "Architecture and standards",
+            "Performance monitoring"
+          ]
+        },
+        "key_integration_points": [
+          "Network connectivity between data centers and cloud",
+          "Security policies across all platforms",
+          "Monitoring and alerting consolidation",
+          "Change coordination across platforms",
+          "Incident escalation and resolution"
+        ],
+        "governance_structure": {
+          "strategic_board": "IT leadership + vendor executives",
+          "operational_board": "Service managers from each vendor",
+          "working_groups": [
+            "Technical integration working group",
+            "Security working group", 
+            "Performance and reporting working group"
+          ]
+        },
+        "success_metrics": [
+          "End-to-end service availability",
+          "Time to resolve cross-vendor incidents",
+          "Cost optimization achievements",
+          "Security compliance across platforms"
+        ]
+      },
+      {
+        "scenario_name": "Application Development and Support",
+        "description": "Multiple vendors providing application development, maintenance, and support services",
+        "typical_structure": {
+          "primary_integrator": "Application portfolio manager or lead development partner",
+          "vendors": [
+            "Core application development partner",
+            "Legacy system maintenance provider",
+            "Mobile/digital experience specialist",
+            "Testing and quality assurance provider",
+            "DevOps and deployment automation provider"
+          ],
+          "retained_functions": [
+            "Product ownership and roadmap",
+            "Architecture governance",
+            "Integration testing coordination",
+            "Release management oversight"
+          ]
+        },
+        "key_integration_points": [
+          "Code repository and branching strategies",
+          "Continuous integration and deployment pipelines",
+          "Testing environments and data management",
+          "Release coordination and rollback procedures",
+          "Knowledge sharing and documentation"
+        ],
+        "governance_structure": {
+          "product_council": "Product owners + development leads",
+          "architecture_board": "Technical architects from all vendors",
+          "agile_ceremonies": "Integrated scrum of scrums, shared retrospectives"
+        },
+        "success_metrics": [
+          "Feature delivery velocity",
+          "Defect rates across vendor boundaries", 
+          "Time to market for new features",
+          "Developer productivity and satisfaction"
+        ]
+      },
+      {
+        "scenario_name": "End-to-End Service Management",
+        "description": "Comprehensive ITSM across multiple technology and service providers",
+        "typical_structure": {
+          "primary_integrator": "Service management center of excellence",
+          "vendors": [
+            "Service desk and level 1 support",
+            "Application support specialists",
+            "Infrastructure support teams",
+            "Security operations center",
+            "Business process outsourcing partners"
+          ],
+          "retained_functions": [
+            "Service catalog management",
+            "SLA definition and monitoring",
+            "Customer relationship management",
+            "Continuous improvement coordination"
+          ]
+        },
+        "key_integration_points": [
+          "Unified service catalog and request fulfillment",
+          "Integrated incident and problem management",
+          "Change advisory board coordination",
+          "Asset and configuration management",
+          "Knowledge management across providers"
+        ],
+        "governance_structure": {
+          "service_board": "Service owners + vendor service managers",
+          "operational_reviews": "Weekly operational performance reviews",
+          "improvement_board": "Monthly continuous improvement coordination"
+        },
+        "success_metrics": [
+          "Customer satisfaction scores",
+          "First call resolution rates",
+          "Mean time to resolution",
+          "Service availability and performance"
+        ]
+      },
+      {
+        "scenario_name": "Digital Transformation Initiative",
+        "description": "Large-scale digital transformation with multiple specialized technology partners",
+        "typical_structure": {
+          "primary_integrator": "Digital transformation office or systems integrator",
+          "vendors": [
+            "Cloud migration specialist",
+            "Data analytics and AI provider",
+            "Customer experience platform provider",
+            "Enterprise software implementation partner",
+            "Change management and training provider"
+          ],
+          "retained_functions": [
+            "Program management and coordination",
+            "Business architecture and requirements",
+            "Integration architecture and standards",
+            "Benefits realization tracking"
+          ]
+        },
+        "key_integration_points": [
+          "Data integration across platforms",
+          "User experience consistency",
+          "Security and compliance standards",
+          "Training and change management coordination",
+          "Go-live coordination and support"
+        ],
+        "governance_structure": {
+          "transformation_board": "Sponsor + program leads + vendor executives",
+          "integration_team": "Technical leads from all workstreams",
+          "user_advisory_group": "Business representatives and end users"
+        },
+        "success_metrics": [
+          "On-time delivery of transformation milestones",
+          "User adoption rates",
+          "Business benefits realization",
+          "Integration success rates"
+        ]
+      }
+    ],
+    "governance_patterns": {
+      "centralized_governance": {
+        "description": "Single point of control with strong central authority",
+        "when_to_use": "High complexity, critical services, strong retained capability",
+        "pros": ["Clear accountability", "Consistent standards", "Effective coordination"],
+        "cons": ["Potential bottleneck", "May slow decision-making", "Requires strong central team"]
+      },
+      "federated_governance": {
+        "description": "Distributed decision-making with coordination mechanisms",
+        "when_to_use": "Lower complexity, specialized domains, mature vendor relationships",
+        "pros": ["Faster decisions", "Domain expertise", "Vendor empowerment"],
+        "cons": ["Potential inconsistency", "Coordination challenges", "Accountability gaps"]
+      },
+      "hybrid_governance": {
+        "description": "Mix of centralized and federated approaches by domain or decision type",
+        "when_to_use": "Most real-world scenarios with varying complexity and criticality",
+        "pros": ["Balanced approach", "Flexibility", "Appropriate control"],
+        "cons": ["Complexity to design", "Clear boundaries needed", "Regular review required"]
+      }
+    },
+    "contract_models": {
+      "prime_contractor": {
+        "description": "Single prime contractor with subcontractor relationships",
+        "siam_role": "Integrated into prime contractor responsibilities",
+        "risk_profile": "Lower client risk, higher dependency on prime"
+      },
+      "multi_prime": {
+        "description": "Multiple direct contracts with client organization",
+        "siam_role": "Client-retained or separate SIAM provider",
+        "risk_profile": "Higher coordination complexity, more client control"
+      },
+      "partnership_model": {
+        "description": "Formal partnership or joint venture between providers",
+        "siam_role": "Shared SIAM function across partnership",
+        "risk_profile": "Aligned incentives, complex governance requirements"
+      }
+    }
+  }
+}
